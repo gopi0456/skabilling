@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SK Ayurvedam</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 16px 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .header h2 { margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: 0.5px; }
+        .header .subtitle { font-size: 0.75rem; color: #a8d8ea; margin-top: 3px; letter-spacing: 1px; }
+        .tabs { display: flex; background: #fff; border-bottom: 1px solid #e8e8e8; position: sticky; top: 62px; z-index: 99; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .tab-btn { flex: 1; padding: 10px 5px; border: none; background: none; font-weight: 600; color: #888; cursor: pointer; border-bottom: 3px solid transparent; font-size: 0.78rem; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: all 0.2s ease; }
+        .tab-btn .tab-icon { font-size: 1.3rem; }
+        .tab-btn.active { color: #0f3460; border-bottom: 3px solid #e94560; background: #fafbfc; }
+        .tab-btn:active { transform: scale(0.95); }
+        .container { padding: 12px; max-width: 900px; margin: 0 auto; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card { background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 12px; border: 1px solid #f0f0f0; }
+        .card h3 { margin: 0 0 12px 0; color: #1a1a2e; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+        .card h3 .icon { font-size: 1.2rem; }
+        input[type="text"], input[type="tel"], input[type="number"], select { width: 100%; padding: 11px 12px; margin-bottom: 10px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 0.95rem; transition: border-color 0.2s; background: #fafbfc; }
+        input:focus, select:focus { outline: none; border-color: #0f3460; background: #fff; }
+        input.update-mode { background: #fff9e6; border: 2px solid #f39c12; }
+        .btn { padding: 12px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 10px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .btn:active { transform: scale(0.97); }
+        .btn .btn-icon { font-size: 1.1rem; }
+        .btn-primary { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; }
+        .btn-danger { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
+        .btn-share { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
+        .btn-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); color: white; }
+        .btn-sms { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; }
+        .btn-pdf { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
+        .btn-debug { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; }
+        .btn-back { background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: white; margin-bottom: 12px; }
+        .btn-export { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
+        .btn-import { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; }
+        .btn-edit { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; }
+        .btn-small { padding: 8px 12px; font-size: 0.82rem; width: auto; margin-top: 5px; display: inline-flex; }
+        .table-wrap { overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 600px; }
+        th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+        th { background: #f8f9fa; font-weight: 700; color: #1a1a2e; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px; }
+        tr:hover { background: #f8f9fa; }
+        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; margin-top: 12px; }
+        .summary-grid div { font-size: 0.8rem; background: #f8f9fa; padding: 10px 5px; border-radius: 8px; border: 1px solid #eee; }
+        .summary-grid span { font-weight: bold; color: #1a1a2e; font-size: 1.05rem; display: block; margin-top: 4px; }
+        .month-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 15px; }
+        .month-card { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #a5d6a7; }
+        .month-card .m-label { font-size: 0.75rem; color: #555; font-weight: 600; }
+        .month-card .m-val { font-weight: bold; color: #1a1a2e; font-size: 1rem; margin-top: 3px; }
+        .bill-item, .cust-item { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.2s; border: 1px solid #f0f0f0; border-left: 4px solid #27ae60; }
+        .bill-item:active, .cust-item:active { transform: scale(0.98); background: #f8f9fa; }
+        .cust-item-req { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.2s; border: 1px solid #f0f0f0; border-left: 4px solid #f39c12; }
+        .cust-item-req:active { transform: scale(0.98); background: #f8f9fa; }
+        .req-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px; border-radius: 8px; margin-bottom: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; border-left: 4px solid #f39c12; }
+        .phone-badge { display: inline-block; background: #e8f4f8; color: #1a1a2e; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: 6px; font-weight: 600; }
+        .customer-type-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; }
+        .type-stockist { background: #e8f5e9; color: #2e7d32; border: 2px solid #4caf50; }
+        .type-distributor { background: #fff3e0; color: #e65100; border: 2px solid #ff9800; }
+        .type-customer { background: #e3f2fd; color: #1565c0; border: 2px solid #2196f3; }
+        .update-mobile-wrap { display: flex; align-items: center; background: #fff8e1; border: 1.5px dashed #f39c12; padding: 10px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+        .update-mobile-wrap input[type="checkbox"] { width: auto; margin: 0 10px 0 0; transform: scale(1.3); cursor: pointer; }
+        .update-mobile-wrap label { margin: 0; font-size: 0.85rem; color: #e67e22; font-weight: 600; cursor: pointer; flex: 1; }
+        .update-mobile-wrap.active { background: #fff3cd; border-color: #e67e22; }
+        .search-dropdown { position: relative; margin-bottom: 10px; }
+        .search-dropdown input { width: 100%; padding: 11px 12px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 0.95rem; background: #fafbfc; }
+        .search-dropdown .dropdown-list { display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1.5px solid #e0e0e0; border-top: none; border-radius: 0 0 8px 8px; max-height: 250px; overflow-y: auto; z-index: 1000; box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+        .search-dropdown .dropdown-list.show { display: block; }
+        .search-dropdown .dropdown-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; transition: background 0.15s; }
+        .search-dropdown .dropdown-item:hover { background: #f0f4ff; }
+        .search-dropdown .dropdown-item:last-child { border-bottom: none; }
+        .search-dropdown .dropdown-item .item-name { font-weight: 600; color: #1a1a2e; }
+        .search-dropdown .dropdown-item .item-detail { font-size: 0.78rem; color: #666; margin-top: 2px; }
+        .search-dropdown .dropdown-item .item-mobile { display: inline-block; background: #e8f4f8; color: #0f3460; padding: 1px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 600; margin-left: 6px; }
+        .price-selection { display: flex; gap: 15px; background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1.5px solid #e8e8e8; }
+        .price-selection label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+        .price-selection input[type="checkbox"] { width: auto; margin: 0; transform: scale(1.2); cursor: pointer; }
+        .customer-type-selector { background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1.5px solid #e8e8e8; }
+        .customer-type-selector label { display: block; font-weight: 600; font-size: 0.9rem; color: #1a1a2e; margin-bottom: 8px; }
+        .customer-type-selector select { margin-bottom: 0; font-weight: 600; }
+        .backup-section { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+        .backup-info { background: #e8f4f8; padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 0.82rem; color: #1a1a2e; line-height: 1.6; border: 1px solid #b3d9e8; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); overflow-y: auto; }
+        .modal-content { background: #fff; margin: 5% auto; padding: 20px; border-radius: 16px; width: 92%; max-width: 600px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-content h3 { margin: 0 0 10px 0; text-align: center; color: #1a1a2e; }
+        .modal-close { float: right; font-size: 1.5rem; cursor: pointer; color: #999; margin-top: -5px; }
+        .share-options { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .share-options .btn { margin-top: 0; }
+        #debug-box { display:none; background:#1a1a2e; color:#0f0; padding:12px; margin-top:10px; max-height:300px; overflow:auto; font-size:11px; border-radius:8px; white-space:pre-wrap; font-family: monospace; }
+        #upload-status, #backup-status { font-weight: bold; margin-top: 10px; font-size: 0.9rem; }
+        .section-title { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .section-title .s-icon { font-size: 1.3rem; }
+        .section-title h4 { margin: 0; color: #555; font-size: 0.9rem; }
+        .bill-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+        .bill-actions .btn-small { flex: 1; min-width: 80px; margin-top: 0; }
+        .manual-prod-item { display: flex; justify-content: space-between; align-items: center; background: #fff9e6; padding: 10px; border-radius: 8px; margin-bottom: 6px; border: 1px solid #ffe0a3; border-left: 4px solid #f39c12; }
+        .manual-prod-item .prod-info { flex: 1; }
+        .manual-prod-item .prod-name { font-weight: 600; color: #1a1a2e; }
+        .manual-prod-item .prod-prices { font-size: 0.78rem; color: #666; margin-top: 2px; }
+        .manual-badge { display: inline-block; background: #f39c12; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.65rem; font-weight: bold; margin-left: 5px; }
+        .edit-item-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; padding: 8px; background: #f8f9fa; border-radius: 6px; margin-bottom: 6px; align-items: center; }
+        .edit-item-row .item-name { font-weight: 600; font-size: 0.85rem; }
+        .edit-item-row input { margin-bottom: 0; padding: 6px 8px; font-size: 0.85rem; }
+        .settings-submenu { display: flex; gap: 8px; margin-bottom: 12px; border-bottom: 2px solid #eee; }
+        .settings-submenu button { flex: 1; padding: 10px; border: none; background: none; cursor: pointer; font-weight: 600; color: #888; border-bottom: 3px solid transparent; font-size: 0.85rem; }
+        .settings-submenu button.active { color: #0f3460; border-bottom-color: #e94560; }
+        .settings-panel { display: none; }
+        .settings-panel.active { display: block; }
+        .qty-badge { display: inline-block; background: #0f3460; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>🏥 SK AYURVEDAM WELLNESS CENTRE</h2>
+        <div class="subtitle">KEVA SUPER STOCK POINT</div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="billing"><span class="tab-icon">🧾</span>Billing</button>
+        <button class="tab-btn" data-tab="history"><span class="tab-icon">📊</span>History</button>
+        <button class="tab-btn" data-tab="requirement"><span class="tab-icon">📦</span>Requirement</button>
+        <button class="tab-btn" data-tab="settings"><span class="tab-icon">⚙️</span>Settings</button>
+    </div>
+
+    <div class="container">
+        <div id="billing" class="tab-content active">
+            <div class="card">
+                <h3><span class="icon">👤</span> Customer Details</h3>
+                <div id="customer-type-display" style="display:none;"><span class="customer-type-badge" id="customer-type-badge"></span></div>
+                <div class="search-dropdown" id="cust-dropdown">
+                    <input type="text" id="cust-name" placeholder="🔍 Search Customer Name" autocomplete="off">
+                    <div class="dropdown-list" id="cust-list"></div>
+                </div>
+                <input type="tel" id="cust-mobile" placeholder="📱 Mobile Number (10 digits)" maxlength="10" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+                <div class="update-mobile-wrap" id="bill-update-wrap" onclick="toggleUpdateMobile('bill')">
+                    <input type="checkbox" id="bill-update-mobile" onclick="event.stopPropagation(); handleUpdateMobileCheck('bill', this)">
+                    <label for="bill-update-mobile" onclick="event.stopPropagation()">🔄 Update Mobile Number</label>
+                </div>
+                <div class="price-selection">
+                    <label><input type="checkbox" id="show-mrp" checked onchange="updatePriceDisplay()"> 💲 MRP</label>
+                    <label><input type="checkbox" id="show-sp" checked onchange="updatePriceDisplay()"> 🏷️ SP</label>
+                    <label><input type="checkbox" id="show-bp" checked onchange="updatePriceDisplay()"> 💰 BP</label>
+                </div>
+            </div>
+            <div class="card">
+                <h3><span class="icon">🛒</span> Add Products</h3>
+                <div class="search-dropdown" id="prod-dropdown">
+                    <input type="text" id="prod-search" placeholder="🔍 Search Product" autocomplete="off">
+                    <div class="dropdown-list" id="prod-list"></div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>ITEM</th><th class="col-mrp">MRP</th><th class="col-sp">SP</th><th class="col-bp">BP</th><th>QTY</th><th class="col-mrp">T.MRP</th><th class="col-sp">T.SP</th><th class="col-bp">T.BP</th><th>X</th></tr></thead>
+                        <tbody id="cart-body"></tbody>
+                    </table>
+                </div>
+                <div class="summary-grid" id="summary-grid">
+                    <div class="col-mrp">💲 Total MRP<span>Rs. <span id="tot-mrp">0.00</span></span></div>
+                    <div class="col-sp">🏷️ Total SP<span>Rs. <span id="tot-sp">0.00</span></span></div>
+                    <div class="col-bp">💰 Total BP<span><span id="tot-bp">0.00</span> BP</span></div>
+                </div>
+                <button class="btn btn-primary" onclick="saveBill()"><span class="btn-icon">💾</span> Save Bill</button>
+            </div>
+        </div>
+
+        <div id="history" class="tab-content">
+            <div class="card">
+                <div id="history-main-view">
+                    <h3><span class="icon">📊</span> Customer Bill History</h3>
+                    <input type="text" id="search-history" placeholder="🔍 Search Customer..." oninput="loadHistoryCustomers()">
+                    <div id="customer-list"></div>
+                </div>
+                <div id="history-detail-view" style="display:none;">
+                    <button class="btn btn-back" onclick="goBackToCustomers()"><span class="btn-icon">⬅️</span> Back to Customers</button>
+                    <h3 id="detail-cust-name" style="margin-top:0; border-bottom: 2px solid #27ae60; padding-bottom: 8px;"></h3>
+                    <div class="section-title"><span class="s-icon">📅</span><h4>Monthly BP Summary</h4></div>
+                    <div id="monthly-summary" class="month-grid"></div>
+                    <div class="section-title"><span class="s-icon">🧾</span><h4>All Bills</h4></div>
+                    <div id="detail-bill-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="requirement" class="tab-content">
+            <div class="card">
+                <h3><span class="icon">📝</span> Add New Requirement</h3>
+                <div class="search-dropdown" id="req-cust-dropdown">
+                    <input type="text" id="req-cust" placeholder="🔍 Search Customer Name" autocomplete="off">
+                    <div class="dropdown-list" id="cust-list-req"></div>
+                </div>
+                <input type="tel" id="req-mobile" placeholder="📱 Mobile Number (10 digits)" maxlength="10" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+                <div class="update-mobile-wrap" id="req-update-wrap" onclick="toggleUpdateMobile('req')">
+                    <input type="checkbox" id="req-update-mobile" onclick="event.stopPropagation(); handleUpdateMobileCheck('req', this)">
+                    <label for="req-update-mobile" onclick="event.stopPropagation()">🔄 Update Mobile Number</label>
+                </div>
+                <div class="customer-type-selector">
+                    <label for="req-customer-type">👤 Customer Type</label>
+                    <select id="req-customer-type">
+                        <option value="stockist">🟢 Stockist (MRP + SP + BP)</option>
+                        <option value="distributor">🟠 Distributor (MRP + BP)</option>
+                        <option value="customer" selected>🔵 Customer (MRP only)</option>
+                    </select>
+                </div>
+                <div class="search-dropdown" id="req-prod-dropdown">
+                    <input type="text" id="req-prod" placeholder="🔍 Search Product" autocomplete="off">
+                    <div class="dropdown-list" id="prod-list-req"></div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Item</th><th>Qty</th><th>X</th></tr></thead>
+                        <tbody id="req-body"></tbody>
+                    </table>
+                </div>
+                <button class="btn btn-primary" onclick="saveRequirement()"><span class="btn-icon">💾</span> Save Requirement</button>
+            </div>
+            <div class="card">
+                <div id="req-main-view">
+                    <h3><span class="icon">📦</span> Pending Requirements</h3>
+                    <input type="text" id="search-req" placeholder="🔍 Search Customer..." oninput="loadRequirementCustomers()">
+                    <div id="req-customer-list"></div>
+                </div>
+                <div id="req-detail-view" style="display:none;">
+                    <button class="btn btn-back" onclick="goBackToReqCustomers()"><span class="btn-icon">⬅️</span> Back to Customers</button>
+                    <h3 id="req-detail-cust-name" style="margin-top:0; border-bottom: 2px solid #f39c12; padding-bottom: 8px;"></h3>
+                    <div id="req-detail-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings" class="tab-content">
+            <div class="settings-submenu">
+                <button class="active" onclick="switchSettingsPanel('products', this)">📄 Products</button>
+                <button onclick="switchSettingsPanel('manual', this)">⭐ Manual Products</button>
+                <button onclick="switchSettingsPanel('backup', this)">💾 Backup</button>
+            </div>
+            <div id="panel-products" class="settings-panel active">
+                <div class="card">
+                    <h3><span class="icon">📄</span> Update Products (PDF/Excel)</h3>
+                    <input type="file" id="file-upload" accept=".pdf,.xlsx,.xls,.csv" onchange="handleFileUpload(event)">
+                    <p id="upload-status"></p>
+                    <button class="btn btn-debug" onclick="toggleDebug()"><span class="btn-icon">🔍</span> Show/Hide Raw PDF Text</button>
+                    <pre id="debug-box"></pre>
+                    <button class="btn btn-danger" style="margin-top:15px;" onclick="clearProducts()"><span class="btn-icon">🗑️</span> Clear PDF Products</button>
+                    <p style="font-size:0.78rem; color:#888; margin-top:8px;">⚠️ This only clears PDF/Excel products. Manual products (⭐) are safe.</p>
+                </div>
+            </div>
+            <div id="panel-manual" class="settings-panel">
+                <div class="card">
+                    <h3><span class="icon">⭐</span> Manual Products (Permanent)</h3>
+                    <p style="font-size:0.82rem; color:#666; margin-bottom:10px;">These products are <strong>permanent</strong> and won't be deleted when you upload a new PDF.</p>
+                    <input type="text" id="manual-prod-name" placeholder="📦 Product Name">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
+                        <input type="number" id="manual-prod-mrp" placeholder="💲 MRP" step="0.01" min="0">
+                        <input type="number" id="manual-prod-sp" placeholder="🏷️ SP" step="0.01" min="0">
+                        <input type="number" id="manual-prod-bp" placeholder="💰 BP" step="0.01" min="0">
+                    </div>
+                    <button class="btn btn-primary" onclick="addManualProduct()"><span class="btn-icon">➕</span> Add Manual Product</button>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">📋</span> Saved Manual Products</h3>
+                    <div id="manual-products-list"></div>
+                </div>
+            </div>
+            <div id="panel-backup" class="settings-panel">
+                <div class="card">
+                    <h3><span class="icon">💾</span> Data Backup & Restore</h3>
+                    <div class="backup-section">
+                        <button class="btn btn-export" onclick="exportData()"><span class="btn-icon">📤</span> Export</button>
+                        <button class="btn btn-import" onclick="document.getElementById('import-file').click()"><span class="btn-icon">📥</span> Import</button>
+                    </div>
+                    <input type="file" id="import-file" accept="*/*" style="display:none;" onchange="importData(event)">
+                    <div class="backup-info">
+                        💾 <strong>Auto-save:</strong> All data is automatically saved locally.<br>
+                        📤 <strong>Export:</strong> Creates a backup file to share/save.<br>
+                        📥 <strong>Import:</strong> Restore data from a backup file.<br>
+                        ⭐ <strong>Includes:</strong> Manual products are also backed up.
+                    </div>
+                    <p id="backup-status"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="share-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeShareModal()">&times;</span>
+            <h3>📤 Share Bill</h3>
+            <p id="share-cust-info" style="text-align:center; color:#666; margin: 8px 0;"></p>
+            <div class="share-options">
+                <button class="btn btn-whatsapp" onclick="shareViaWhatsApp()"><span class="btn-icon">📱</span> WhatsApp</button>
+                <button class="btn btn-sms" onclick="shareViaSMS()"><span class="btn-icon">💬</span> SMS</button>
+                <button class="btn btn-pdf" onclick="shareViaPDF()"><span class="btn-icon">📄</span> PDF Invoice</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeEditModal()">&times;</span>
+            <h3>✏️ Edit Bill</h3>
+            <div id="edit-bill-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const DB = {
+            isCapacitor: window.Capacitor !== undefined,
+            sqlite: null, conn: null,
+            data: JSON.parse(localStorage.getItem('ska_db') || '{"customers":[],"products":[],"bills":[],"bill_items":[],"requirements":[],"manual_products":[]}'),
+            async init() {
+                if (this.isCapacitor && window.CapacitorSQLite) {
+                    try {
+                        this.sqlite = new window.CapacitorSQLite.SQLiteConnection(window.CapacitorSQLite);
+                        this.conn = await this.sqlite.createConnection("ska_db", false, "no-encryption", 1, false);
+                        await this.conn.open();
+                        await this.conn.execute(`CREATE TABLE IF NOT EXISTS customers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, mobile TEXT, customer_type TEXT)`);
+                        await this.conn.execute(`CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, item_name TEXT, mrp REAL, sp REAL, bp REAL)`);
+                        await this.conn.execute(`CREATE TABLE IF NOT EXISTS bills (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id INTEGER, cust_name TEXT, cust_mobile TEXT, customer_type TEXT, date TEXT, total_mrp REAL, total_sp REAL, total_bp REAL, price_columns TEXT)`);
+                        await this.conn.execute(`CREATE TABLE IF NOT EXISTS bill_items (id INTEGER PRIMARY KEY AUTOINCREMENT, bill_id INTEGER, item_name TEXT, mrp REAL, sp REAL, bp REAL, qty INTEGER, tot_mrp REAL, tot_sp REAL, tot_bp REAL)`);
+                        await this.conn.execute(`CREATE TABLE IF NOT EXISTS requirements (id INTEGER PRIMARY KEY AUTOINCREMENT, customer TEXT, mobile TEXT, customer_type TEXT, item_name TEXT, qty INTEGER, date TEXT)`);
+                        await this.conn.execute(`CREATE TABLE IF NOT EXISTS manual_products (id INTEGER PRIMARY KEY AUTOINCREMENT, item_name TEXT, mrp REAL, sp REAL, bp REAL)`);
+                        try { await this.conn.execute(`ALTER TABLE requirements ADD COLUMN customer_type TEXT`); } catch (e) {}
+                        try { await this.conn.execute(`ALTER TABLE customers ADD COLUMN customer_type TEXT`); } catch (e) {}
+                    } catch (err) { this.isCapacitor = false; }
+                }
+                if (!this.data.manual_products) { this.data.manual_products = []; localStorage.setItem('ska_db', JSON.stringify(this.data)); }
+            },
+            async query(table) { if (this.isCapacitor && this.conn) { const res = await this.conn.query(`SELECT * FROM ${table}`); return res.values || []; } return this.data[table] || []; },
+            async run(table, item) {
+                if (this.isCapacitor && this.conn) { const cols = Object.keys(item); const vals = Object.values(item); const res = await this.conn.execute(`INSERT INTO ${table} (${cols.join(',')}) VALUES (${cols.map(()=>'?').join(',')})`, vals); return res.changes.lastId; }
+                else { item.id = Date.now() + Math.random(); this.data[table].push(item); localStorage.setItem('ska_db', JSON.stringify(this.data)); return item.id; }
+            },
+            async clear(table) { if (this.isCapacitor && this.conn) await this.conn.execute(`DELETE FROM ${table}`); else { this.data[table] = []; localStorage.setItem('ska_db', JSON.stringify(this.data)); } },
+            async update(table, id, updates) {
+                if (this.isCapacitor && this.conn) { const sets = Object.keys(updates).map(k => `${k}=?`).join(','); await this.conn.execute(`UPDATE ${table} SET ${sets} WHERE id=?`, [...Object.values(updates), id]); }
+                else { const item = this.data[table].find(i => i.id == id); if (item) Object.assign(item, updates); localStorage.setItem('ska_db', JSON.stringify(this.data)); }
+            },
+            async delete(table, id) {
+                if (this.isCapacitor && this.conn) await this.conn.execute(`DELETE FROM ${table} WHERE id=?`, [id]);
+                else { this.data[table] = this.data[table].filter(r => r.id.toString() !== id.toString()); localStorage.setItem('ska_db', JSON.stringify(this.data)); }
+            }
+        };
+
+        function cleanProductName(name, customerType) {
+            if (customerType === 'stockist') return name;
+            let c = name;
+            c = c.replace(/\s*\(\s*(?:buy|get|offer|free|combo|pack|\d+\s*\+\s*\d+)[^)]*\)\s*/gi, ' ');
+            c = c.replace(/\s*(?:buy\s+\d+\s+get\s+\d+(?:\s+free)?|offer|combo\s+pack|value\s+pack|\d+\s*\+\s*\d+\s*(?:offer|free|pack)?|free\s+gift|special\s+offer)\s*/gi, ' ');
+            c = c.replace(/\s*-\s*(?:offer|combo|pack|free|buy\s+\d+|get\s+\d+)[^-]*$/gi, ' ');
+            c = c.replace(/\s*\|\s*(?:offer|combo|pack|free|buy|get)[^|]*$/gi, ' ');
+            c = c.replace(/\s*\[\s*(?:offer|combo|pack|free|buy|get)[^\]]*\]\s*/gi, ' ');
+            c = c.replace(/\s+/g, ' ').trim();
+            return c || name;
+        }
+
+        let dropdownCache = { customers: [], products: [], lastUpdate: 0 };
+        
+        async function refreshDropdownCache() {
+            const cs = await DB.query('customers');
+            const pdfProds = await DB.query('products');
+            const manualProds = await DB.query('manual_products');
+            const merged = new Map();
+            pdfProds.forEach(p => merged.set(p.item_name.toLowerCase(), {...p, source: 'pdf'}));
+            manualProds.forEach(p => merged.set(p.item_name.toLowerCase(), {...p, source: 'manual'}));
+            dropdownCache = {
+                customers: cs.map(c=>({name:c.name,mobile:c.mobile||'',type:c.customer_type||'customer',detail:c.mobile?`${c.mobile} | ${(c.customer_type||'customer').toUpperCase()}`:(c.customer_type||'customer').toUpperCase()})),
+                products: Array.from(merged.values()).map(p=>({name:p.item_name,detail:`MRP: ${p.mrp} | SP: ${p.sp} | BP: ${p.bp}`,source:p.source||'pdf'})),
+                lastUpdate: Date.now()
+            };
+        }
+
+        function getCustomerType(m, s, b) { if (m && s && b) return 'stockist'; if (m && b && !s) return 'distributor'; return 'customer'; }
+
+        function updatePriceDisplay() {
+            const m = document.getElementById('show-mrp').checked, s = document.getElementById('show-sp').checked, b = document.getElementById('show-bp').checked;
+            document.querySelectorAll('.col-mrp').forEach(el => el.style.display = m ? '' : 'none');
+            document.querySelectorAll('.col-sp').forEach(el => el.style.display = s ? '' : 'none');
+            document.querySelectorAll('.col-bp').forEach(el => el.style.display = b ? '' : 'none');
+            const badge = document.getElementById('customer-type-badge'), display = document.getElementById('customer-type-display');
+            if (document.getElementById('cust-name').value.trim()) { const t = getCustomerType(m, s, b); badge.className = `customer-type-badge type-${t}`; badge.innerText = t.toUpperCase(); display.style.display = 'block'; }
+            else display.style.display = 'none';
+            renderCart();
+        }
+
+        let billFromDD = false, reqFromDD = false;
+
+        const dropdownInitialized = {};
+        function setupSearchDropdown(inputId, listId, dataKey, onSelect) {
+            if (dropdownInitialized[inputId]) return;
+            dropdownInitialized[inputId] = true;
+            const input = document.getElementById(inputId), list = document.getElementById(listId);
+            let debounceTimer;
+            function renderWithDebounce() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => renderDD(), 50);
+            }
+            input.addEventListener('focus', renderWithDebounce);
+            input.addEventListener('input', renderWithDebounce);
+            input.addEventListener('blur', () => { setTimeout(() => list.classList.remove('show'), 200); });
+            
+            function renderDD() {
+                const data = dataKey === 'customers' ? dropdownCache.customers : dropdownCache.products;
+                const f = input.value.toLowerCase();
+                const filtered = data.filter(i => i.name.toLowerCase().includes(f) || (i.detail && i.detail.toLowerCase().includes(f)));
+                if (dataKey === 'customers') {
+                    list.innerHTML = filtered.length > 0 ? filtered.slice(0, 50).map(i => `
+                        <div class="dropdown-item" onclick="${onSelect}('${i.name.replace(/'/g,"\\'")}','${(i.mobile||'').replace(/'/g,"\\'")}','${(i.type||'').replace(/'/g,"\\'")}','${(i.detail||'').replace(/'/g,"\\'")}','')">
+                            <div class="item-name">
+                                ${i.name}
+                                ${i.mobile ? `<span class="item-mobile">📱 ${i.mobile}</span>` : ''}
+                                <span class="customer-type-badge type-${i.type||'customer'}" style="font-size:0.6rem;padding:1px 6px;margin-left:4px;margin-bottom:0;">${(i.type||'customer').toUpperCase()}</span>
+                            </div>
+                        </div>
+                    `).join('') : '<div class="dropdown-item" style="color:#999;">No matches found</div>';
+                } else {
+                    list.innerHTML = filtered.length > 0 ? filtered.slice(0, 50).map(i => `<div class="dropdown-item" onclick="${onSelect}('${i.name.replace(/'/g,"\\'")}','${(i.mobile||'').replace(/'/g,"\\'")}','${(i.type||'').replace(/'/g,"\\'")}','${(i.detail||'').replace(/'/g,"\\'")}','${(i.source||'').replace(/'/g,"\\'")}')"><div class="item-name">${i.name}${i.source==='manual'?'<span class="manual-badge">⭐ MANUAL</span>':''}</div>${i.detail?`<div class="item-detail">${i.detail}</div>`:''}</div>`).join('') : '<div class="dropdown-item" style="color:#999;">No matches found</div>';
+                }
+                list.classList.add('show');
+            }
+        }
+
+        function selectCustomer(name, mobile, type, detail, source) {
+            document.getElementById('cust-name').value = name;
+            document.getElementById('cust-mobile').value = mobile || '';
+            document.getElementById('cust-list').classList.remove('show'); 
+            resetUpdateMobile('bill');
+            billFromDD = true;
+            if (type) {
+                if (type === 'stockist') { document.getElementById('show-mrp').checked = true; document.getElementById('show-sp').checked = true; document.getElementById('show-bp').checked = true; }
+                else if (type === 'distributor') { document.getElementById('show-mrp').checked = true; document.getElementById('show-sp').checked = false; document.getElementById('show-bp').checked = true; }
+                else { document.getElementById('show-mrp').checked = true; document.getElementById('show-sp').checked = false; document.getElementById('show-bp').checked = false; }
+            } else { determineCustomerType(name, mobile); }
+            updatePriceDisplay();
+        }
+        
+        async function determineCustomerType(n, m) {
+            const bills = await DB.query('bills');
+            const cm = (m||'').replace(/\D/g,'');
+            const cb = bills.filter(b => b.cust_name === n && (b.cust_mobile||'').replace(/\D/g,'') === cm);
+            if (cb.length > 0) { 
+                const l = cb.sort((a,b) => new Date(b.date)-new Date(a.date))[0]; 
+                if (l.price_columns) { const c = l.price_columns.split(','); document.getElementById('show-mrp').checked = c.includes('mrp'); document.getElementById('show-sp').checked = c.includes('sp'); document.getElementById('show-bp').checked = c.includes('bp'); } 
+            } else { document.getElementById('show-mrp').checked = true; document.getElementById('show-sp').checked = true; document.getElementById('show-bp').checked = true; }
+            updatePriceDisplay();
+        }
+        
+        function selectReqCustomer(name, mobile, type, detail, source) {
+            document.getElementById('req-cust').value = name;
+            document.getElementById('req-mobile').value = mobile || '';
+            document.getElementById('cust-list-req').classList.remove('show'); 
+            resetUpdateMobile('req');
+            reqFromDD = true;
+            if (type) document.getElementById('req-customer-type').value = type; else findCustTypeReq(name, mobile);
+        }
+        
+        async function findCustTypeReq(n, m) {
+            const cs = await DB.query('customers');
+            const cm = (m||'').replace(/\D/g,'');
+            const c = cs.find(x => x.name === n && (x.mobile||'').replace(/\D/g,'') === cm && x.customer_type);
+            if (c) { document.getElementById('req-customer-type').value = c.customer_type; return; }
+            const bs = await DB.query('bills');
+            const cb = bs.filter(b => b.cust_name === n && (b.cust_mobile||'').replace(/\D/g,'') === cm && b.customer_type);
+            if (cb.length > 0) { document.getElementById('req-customer-type').value = cb.sort((a,b)=>new Date(b.date)-new Date(a.date))[0].customer_type||'customer'; return; }
+            const rs = await DB.query('requirements');
+            const cr = rs.filter(r => r.customer === n && (r.mobile||'').replace(/\D/g,'') === cm && r.customer_type);
+            if (cr.length > 0) { document.getElementById('req-customer-type').value = cr.sort((a,b)=>new Date(b.date)-new Date(a.date))[0].customer_type||'customer'; return; }
+            document.getElementById('req-customer-type').value = 'customer';
+        }
+        
+        function selectProduct(name, mobile, type, detail, source) { 
+            document.getElementById('prod-search').value = ''; 
+            document.getElementById('prod-list').classList.remove('show'); 
+            const p = dropdownCache.products.find(x => x.name === name); 
+            if (p) { 
+                const mrp = parseFloat(p.detail.match(/MRP: ([\d.]+)/)[1]) || 0;
+                const sp = parseFloat(p.detail.match(/SP: ([\d.]+)/)[1]) || 0;
+                const bp = parseFloat(p.detail.match(/BP: ([\d.]+)/)[1]) || 0;
+                const existing = cart.find(i => i.item_name === p.name);
+                if (existing) existing.qty += 1; else cart.push({item_name: p.name, mrp, sp, bp, qty: 1});
+                renderCart(); 
+            } 
+        }
+        
+        function selectReqProduct(name, mobile, type, detail, source) { 
+            document.getElementById('req-prod').value = ''; 
+            document.getElementById('prod-list-req').classList.remove('show'); 
+            const p = dropdownCache.products.find(x => x.name === name);
+            if (p) { 
+                const existing = reqList.find(i => i.item_name === p.name);
+                if (existing) existing.qty += 1; else reqList.push({item_name: p.name, qty: 1});
+                renderReq(); 
+            } 
+        }
+
+        function handleUpdateMobileCheck(prefix, cb) {
+            const wrap = document.getElementById(`${prefix}-update-wrap`), mi = document.getElementById(`${prefix}-mobile`), ni = document.getElementById(prefix==='bill'?'cust-name':'req-cust');
+            if (cb.checked) { if (!ni.value.trim()) { alert('⚠️ Enter customer name first.'); cb.checked = false; return; } if (confirm(`⚠️ UPDATE MOBILE\n\nUpdate for "${ni.value.trim()}"?`)) { cb.checked = true; wrap.classList.add('active'); mi.classList.add('update-mode'); mi.focus(); mi.select(); } else { cb.checked = false; wrap.classList.remove('active'); mi.classList.remove('update-mode'); } }
+            else { wrap.classList.remove('active'); mi.classList.remove('update-mode'); }
+        }
+        function toggleUpdateMobile(p) { const c = document.getElementById(`${p}-update-mobile`); c.checked = !c.checked; handleUpdateMobileCheck(p, c); }
+        function resetUpdateMobile(p) { document.getElementById(`${p}-update-mobile`).checked = false; document.getElementById(`${p}-update-wrap`).classList.remove('active'); document.getElementById(`${p}-mobile`).classList.remove('update-mode'); }
+        
+        function findCustomer(cs, n, m) { 
+            const cm = (m||'').replace(/\D/g,''); 
+            let c = cs.find(x => x.name===n && (x.mobile||'').replace(/\D/g,'')===cm); 
+            if (c) return c; 
+            if (!cm) { c = cs.find(x => x.name===n && !(x.mobile&&x.mobile.trim())); if (c) return c; } 
+            return null; 
+        }
+
+        document.querySelectorAll('.tab-btn').forEach(btn => { 
+            btn.addEventListener('click', function() { 
+                const t = this.getAttribute('data-tab'); 
+                document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active')); 
+                document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active')); 
+                document.getElementById(t).classList.add('active'); 
+                this.classList.add('active');
+                requestAnimationFrame(() => {
+                    if (t==='history') { goBackToCustomers(); loadHistoryCustomers(); }
+                    else if (t==='requirement') { goBackToReqCustomers(); loadRequirementCustomers(); }
+                    else if (t==='settings') { loadManualProducts(); }
+                });
+            }); 
+        });
+
+        async function setupAutoClear(inputId, mobileId, flag) {
+            let debounceTimer;
+            document.getElementById(inputId).addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(async () => {
+                    const typed = this.value.trim().toLowerCase();
+                    const typedMobile = document.getElementById(mobileId).value.trim();
+                    if (flag === 'bill') { 
+                        if (!billFromDD) { 
+                            const m = dropdownCache.customers.find(c => c.name.toLowerCase() === typed && (c.mobile||'').replace(/\D/g,'') === typedMobile.replace(/\D/g,'')); 
+                            if (m) {
+                                document.getElementById(mobileId).value = m.mobile || '';
+                                if (m.type) {
+                                    if (m.type === 'stockist') { document.getElementById('show-mrp').checked = true; document.getElementById('show-sp').checked = true; document.getElementById('show-bp').checked = true; }
+                                    else if (m.type === 'distributor') { document.getElementById('show-mrp').checked = true; document.getElementById('show-sp').checked = false; document.getElementById('show-bp').checked = true; }
+                                    else { document.getElementById('show-mrp').checked = true; document.getElementById('show-sp').checked = false; document.getElementById('show-bp').checked = false; }
+                                    updatePriceDisplay();
+                                }
+                            } else { document.getElementById(mobileId).value = ''; document.getElementById('show-mrp').checked = true; document.getElementById('show-sp').checked = true; document.getElementById('show-bp').checked = true; updatePriceDisplay(); } 
+                        } 
+                        setTimeout(() => { billFromDD = false; }, 100); 
+                    } else { 
+                        if (!reqFromDD) { 
+                            const m = dropdownCache.customers.find(c => c.name.toLowerCase() === typed && (c.mobile||'').replace(/\D/g,'') === typedMobile.replace(/\D/g,'')); 
+                            if (m) { document.getElementById(mobileId).value = m.mobile || ''; if (m.type) document.getElementById('req-customer-type').value = m.type; else findCustTypeReq(m.name, m.mobile); }
+                            else { document.getElementById(mobileId).value = ''; document.getElementById('req-customer-type').value = 'customer'; } 
+                        } 
+                        setTimeout(() => { reqFromDD = false; }, 100); 
+                    }
+                }, 150);
+            });
+        }
+
+        async function loadHistoryCustomers() {
+            const s = document.getElementById('search-history').value.toLowerCase(), bills = await DB.query('bills'), cm = {};
+            bills.forEach(b => { 
+                const name = (b.cust_name||'Unknown').toLowerCase();
+                const mobile = (b.cust_mobile||'').replace(/\D/g,'');
+                const k = name+'_'+mobile; 
+                if (!cm[k]) cm[k] = {name:b.cust_name||'Unknown',mobile:b.cust_mobile||'',customer_type:b.customer_type||'customer',total_bp:0,bill_count:0,latestDate:b.date}; 
+                cm[k].total_bp+=(b.total_bp||0); 
+                cm[k].bill_count++;
+                if (new Date(b.date)>new Date(cm[k].latestDate)) {
+                    cm[k].customer_type=b.customer_type||'customer';
+                    cm[k].latestDate=b.date;
+                    cm[k].mobile=b.cust_mobile||cm[k].mobile;
+                }
+            });
+            let ca = Object.values(cm); 
+            if (s) ca = ca.filter(c => c.name.toLowerCase().includes(s)||(c.mobile||'').includes(s)); 
+            ca.sort((a,b)=>a.name.localeCompare(b.name));
+            document.getElementById('customer-list').innerHTML = ca.map(c => { 
+                const tc=`type-${c.customer_type||'customer'}`, tl=(c.customer_type||'customer').toUpperCase(); 
+                return `<div class="cust-item" onclick="showCustomerHistory('${c.name.replace(/'/g,"\\'")}','${(c.mobile||'').replace(/'/g,"\\'")}')">
+                    <strong>${c.name}</strong> 
+                    <span class="phone-badge">📱 ${c.mobile||'No Mobile'}</span>
+                    <span class="customer-type-badge ${tc}" style="font-size:0.65rem;padding:2px 8px;margin-left:5px;">${tl}</span>
+                    <span style="float:right;color:#27ae60;font-weight:bold;">${c.total_bp.toFixed(2)} BP</span>
+                    <div style="color:#666;font-size:0.82rem;margin-top:4px;">📋 ${c.bill_count} Bill(s) | Tap to view</div>
+                </div>`; 
+            }).join('') || '<p style="text-align:center;color:#888;padding:20px;">No customers found.</p>';
+        }
+        
+        async function showCustomerHistory(name, mobile) {
+            document.getElementById('history-main-view').style.display='none'; 
+            document.getElementById('history-detail-view').style.display='block'; 
+            document.getElementById('detail-cust-name').innerHTML=`${name} <span class="phone-badge">📱 ${mobile||'No Mobile'}</span>`;
+            const cm = (mobile||'').replace(/\D/g,'');
+            const bills = (await DB.query('bills')).filter(b=>(b.cust_name||'').toLowerCase()===name.toLowerCase()&&(b.cust_mobile||'').replace(/\D/g,'')===cm).sort((a,b)=>new Date(b.date)-new Date(a.date)), mt={};
+            bills.forEach(b => { const d=new Date(b.date), mk=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; if(!mt[mk]) mt[mk]=0; mt[mk]+=(b.total_bp||0); });
+            const mn=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            document.getElementById('monthly-summary').innerHTML = Object.keys(mt).sort().reverse().map(k => { const [y,m]=k.split('-'); return `<div class="month-card"><div class="m-label">${mn[parseInt(m)-1]} ${y}</div><div class="m-val">${mt[k].toFixed(2)} BP</div></div>`; }).join('') || '<p>No data</p>';
+            document.getElementById('detail-bill-list').innerHTML = bills.map(b => { 
+                const tc=`type-${b.customer_type||'customer'}`, tl=(b.customer_type||'customer').toUpperCase(); 
+                return `<div class="bill-item" style="cursor:default;">
+                    <span class="customer-type-badge ${tc}" style="font-size:0.65rem;padding:2px 8px;float:right;">${tl}</span>
+                    <span style="float:right;font-weight:bold;color:#27ae60;margin-right:10px;">${(b.total_bp||0).toFixed(2)} BP</span>
+                    <strong>📅 ${new Date(b.date).toLocaleDateString()}</strong>
+                    <div style="color:#666;font-size:0.82rem;margin-top:4px;">💲 MRP: Rs. ${(b.total_mrp||0).toFixed(2)} | 🏷️ SP: Rs. ${(b.total_sp||0).toFixed(2)}</div>
+                    <div class="bill-actions">
+                        <button class="btn btn-edit btn-small" onclick="openEditModal(${b.id})"><span class="btn-icon">✏️</span> Edit</button>
+                        <button class="btn btn-share btn-small" onclick="openShareModal(${b.id})"><span class="btn-icon">📤</span> Share</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteBill(${b.id},'${name.replace(/'/g,"\\'")}','${(mobile||'').replace(/'/g,"\\'")}')"><span class="btn-icon">🗑️</span> Delete</button>
+                    </div>
+                </div>`; 
+            }).join('') || '<p>No bills found.</p>';
+        }
+        
+        function goBackToCustomers() { document.getElementById('history-main-view').style.display='block'; document.getElementById('history-detail-view').style.display='none'; }
+
+        async function deleteBill(billId, custName, custMobile) {
+            if (!confirm('⚠️ DELETE BILL\n\nAre you sure?\n\nThis cannot be undone!')) return;
+            try {
+                const items = await DB.query('bill_items');
+                const billItems = items.filter(i => i.bill_id == billId);
+                for (let item of billItems) await DB.delete('bill_items', item.id);
+                await DB.delete('bills', billId);
+                alert('✅ Bill deleted!');
+                showCustomerHistory(custName, custMobile);
+                loadHistoryCustomers();
+                await refreshDropdownCache();
+            } catch (err) { alert('❌ Error: ' + err.message); }
+        }
+
+        let editingBillId = null, editingItems = [];
+        
+        async function openEditModal(billId) {
+            try {
+                const bills = await DB.query('bills');
+                const bill = bills.find(b => String(b.id) === String(billId));
+                if (!bill) { alert('❌ Bill not found'); return; }
+                const allItems = await DB.query('bill_items');
+                editingItems = allItems.filter(i => String(i.bill_id) === String(billId)).map(i => ({...i}));
+                editingBillId = billId;
+                
+                let html = `<div style="background:#f8f9fa;padding:12px;border-radius:8px;margin-bottom:12px;">
+                        <label style="font-weight:600;font-size:0.85rem;">👤 Customer Name</label>
+                        <input type="text" id="edit-cust-name" value="${bill.cust_name || ''}">
+                        <label style="font-weight:600;font-size:0.85rem;">📱 Mobile</label>
+                        <input type="tel" id="edit-cust-mobile" value="${bill.cust_mobile || ''}" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+                        <label style="font-weight:600;font-size:0.85rem;">👤 Customer Type</label>
+                        <select id="edit-cust-type">
+                            <option value="stockist" ${bill.customer_type==='stockist'?'selected':''}>🟢 Stockist</option>
+                            <option value="distributor" ${bill.customer_type==='distributor'?'selected':''}>🟠 Distributor</option>
+                            <option value="customer" ${bill.customer_type==='customer'?'selected':''}>🔵 Customer</option>
+                        </select>
+                    </div>
+                    <h4 style="margin-bottom:10px;">🛒 Items (${editingItems.length} found)</h4>
+                    <div id="edit-items-list">`;
+                editingItems.forEach((item, idx) => {
+                    html += `<div class="edit-item-row">
+                            <div>
+                                <div class="item-name">${item.item_name || 'Unknown'}</div>
+                                <div style="font-size:0.75rem;color:#666;">MRP: ${item.mrp || 0} | SP: ${item.sp || 0} | BP: ${item.bp || 0}</div>
+                            </div>
+                            <input type="number" value="${item.qty || 1}" min="1" onchange="editingItems[${idx}].qty=parseInt(this.value)||1" style="width:80px;">
+                        </div>`;
+                });
+                html += `</div><div style="display:flex;gap:8px;margin-top:15px;">
+                        <button class="btn btn-primary" onclick="saveEditedBill()" style="flex:1;"><span class="btn-icon">💾</span> Save Changes</button>
+                        <button class="btn btn-back" onclick="closeEditModal()" style="flex:1;"><span class="btn-icon">❌</span> Cancel</button>
+                    </div>`;
+                document.getElementById('edit-bill-content').innerHTML = html;
+                document.getElementById('edit-modal').style.display = 'block';
+            } catch (err) {
+                console.error('Error opening edit modal:', err);
+                alert('❌ Error: ' + err.message);
+            }
+        }
+        
+        function closeEditModal() { document.getElementById('edit-modal').style.display = 'none'; editingBillId = null; editingItems = []; }
+        
+        async function saveEditedBill() {
+            if (!editingBillId || editingItems.length === 0) { alert('No items to save'); return; }
+            const newName = document.getElementById('edit-cust-name').value.trim();
+            const newMobile = document.getElementById('edit-cust-mobile').value.trim();
+            const newType = document.getElementById('edit-cust-type').value;
+            if (!newName) { alert('⚠️ Customer name required'); return; }
+            try {
+                let totalMRP = 0, totalSP = 0, totalBP = 0;
+                editingItems.forEach(item => { totalMRP += (item.mrp || 0) * (item.qty || 0); totalSP += (item.sp || 0) * (item.qty || 0); totalBP += (item.bp || 0) * (item.qty || 0); });
+                await DB.update('bills', editingBillId, { cust_name: newName, cust_mobile: newMobile, customer_type: newType, total_mrp: totalMRP, total_sp: totalSP, total_bp: totalBP });
+                const bills = await DB.query('bills');
+                const bill = bills.find(b => String(b.id) === String(editingBillId));
+                const customers = await DB.query('customers');
+                const cust = customers.find(c => c.id == bill.customer_id);
+                if (cust) await DB.update('customers', cust.id, { name: newName, mobile: newMobile, customer_type: newType });
+                const oldItems = await DB.query('bill_items');
+                const billItems = oldItems.filter(i => String(i.bill_id) === String(editingBillId));
+                for (let item of billItems) await DB.delete('bill_items', item.id);
+                for (let item of editingItems) await DB.run('bill_items', { bill_id: editingBillId, item_name: item.item_name, mrp: item.mrp, sp: item.sp, bp: item.bp, qty: item.qty, tot_mrp: (item.mrp || 0) * (item.qty || 0), tot_sp: (item.sp || 0) * (item.qty || 0), tot_bp: (item.bp || 0) * (item.qty || 0) });
+                alert('✅ Bill updated!');
+                closeEditModal();
+                showCustomerHistory(newName, newMobile);
+                loadHistoryCustomers();
+                await refreshDropdownCache();
+            } catch (err) { alert('❌ Error: ' + err.message); }
+        }
+
+        async function loadRequirementCustomers() {
+            const s = document.getElementById('search-req')?document.getElementById('search-req').value.toLowerCase():'', reqs = (await DB.query('requirements')).filter(r => !s || (r.customer||'').toLowerCase().includes(s) || (r.mobile||'').includes(s)), g={};
+            reqs.forEach(r => { const k=(r.customer||'U')+'_'+((r.mobile||'').replace(/\D/g,'')); if(!g[k]) g[k]={name:r.customer||'Unknown',mobile:r.mobile||'',customer_type:r.customer_type||'customer',count:0,items:[]}; g[k].count++; g[k].items.push(r); });
+            document.getElementById('req-customer-list').innerHTML = Object.values(g).sort((a,b)=>a.name.localeCompare(b.name)).map(c => { const tc=`type-${c.customer_type||'customer'}`, tl=(c.customer_type||'customer').toUpperCase(); return `<div class="cust-item-req" onclick="showCustomerRequirements('${c.name.replace(/'/g,"\\'")}','${(c.mobile||'').replace(/'/g,"\\'")}','${c.customer_type||'customer'}')"><strong>${c.name}</strong> <span class="phone-badge">📱 ${c.mobile||'No Mobile'}</span> <span class="customer-type-badge ${tc}" style="font-size:0.65rem;padding:2px 8px;margin-left:5px;">${tl}</span><span style="float:right;color:#f39c12;font-weight:bold;">${c.count} Pending</span><div style="color:#666;font-size:0.82rem;margin-top:4px;">📦 Tap to view items</div></div>`; }).join('') || '<p style="text-align:center;color:#888;padding:20px;">No pending requirements.</p>';
+        }
+        async function showCustomerRequirements(n, m, t) {
+            document.getElementById('req-main-view').style.display='none'; document.getElementById('req-detail-view').style.display='block';
+            const tc=`type-${t||'customer'}`, tl=(t||'customer').toUpperCase();
+            document.getElementById('req-detail-cust-name').innerHTML=`${n} <span class="customer-type-badge ${tc}" style="font-size:0.65rem;padding:2px 8px;">${tl}</span> <span class="phone-badge">📱 ${m||'No Mobile'}</span>`;
+            const cm=(m||'').replace(/\D/g,''), reqs=(await DB.query('requirements')).filter(r=>r.customer===n&&(r.mobile||'').replace(/\D/g,'')===cm);
+            document.getElementById('req-detail-list').innerHTML = reqs.map(r => `<div class="req-item"><div><strong>📦 ${r.item_name}</strong><div style="color:#666;font-size:0.82rem;">Qty: <strong>${r.qty}</strong> | 📅 ${new Date(r.date).toLocaleDateString()}</div></div><button class="btn btn-danger" style="width:auto;padding:8px 12px;margin:0;font-size:0.8rem;" onclick="deleteRequirement(${r.id},'${n.replace(/'/g,"\\'")}','${(m||'').replace(/'/g,"\\'")}','${(t||'customer').replace(/'/g,"\\'")}')"><span class="btn-icon">✅</span> Done</button></div>`).join('') || '<p>No items pending.</p>';
+        }
+        function goBackToReqCustomers() { document.getElementById('req-main-view').style.display='block'; document.getElementById('req-detail-view').style.display='none'; }
+        async function deleteRequirement(id, n, m, t) { if (confirm('Mark as fulfilled?')) { await DB.delete('requirements', id); if (n) showCustomerRequirements(n, m, t); loadRequirementCustomers(); } }
+
+        let csb=null, csbi=null, csbill=null;
+        
+        async function openShareModal(id) {
+            try {
+                const bs = await DB.query('bills');
+                csbill = bs.find(b => String(b.id) === String(id));
+                if (!csbill) { alert('❌ Bill not found'); return; }
+                const is = await DB.query('bill_items');
+                csbi = is.filter(i => String(i.bill_id) === String(id));
+                csb = id;
+                document.getElementById('share-cust-info').innerHTML = `${csbill.cust_name} | ${csbill.cust_mobile||'No Mobile'}<br><span class="customer-type-badge type-${csbill.customer_type||'customer'}" style="font-size:0.65rem;padding:2px 8px;">${(csbill.customer_type||'customer').toUpperCase()}</span>`;
+                document.getElementById('share-modal').style.display = 'block';
+            } catch (err) {
+                console.error('Error opening share modal:', err);
+                alert('❌ Error: ' + err.message);
+            }
+        }
+        
+        function closeShareModal() { 
+            document.getElementById('share-modal').style.display = 'none'; 
+        }
+        
+        function getBillText() { 
+            if (!csbill || !csbi) return 'Bill data not available';
+            const custType = csbill.customer_type || 'customer';
+            const pc = csbill.price_columns ? csbill.price_columns.split(',') : ['mrp','sp','bp']; 
+            const totalMrp = csbill.total_mrp || 0;
+            const totalSp = csbill.total_sp || 0;
+            const totalBp = csbill.total_bp || 0;
+            let t = '*SK AYURVEDAM WELLNESS CENTRE*\n';
+            t += 'KEVA SUPER STOCK POINT\n';
+            t += '-------------------------\n';
+            t += 'Customer: ' + (csbill.cust_name || 'N/A') + '\n';
+            t += 'Type: ' + custType.toUpperCase() + '\n';
+            t += 'Mobile: ' + (csbill.cust_mobile || 'N/A') + '\n';
+            t += 'Date: ' + new Date(csbill.date).toLocaleString() + '\n\n';
+            t += '*ITEMS:*\n';
+            if (!csbi || csbi.length === 0) {
+                t += 'No items found\n';
+            } else if (custType === 'stockist') {
+                csbi.forEach(function(i, x) {
+                    t += (x+1) + '. ' + (i.item_name || 'Unknown') + '\n';
+                    t += '   Qty: ' + (i.qty || 0);
+                    if (pc.includes('mrp')) t += ' | MRP: ' + (i.mrp || 0);
+                    if (pc.includes('sp')) t += ' | SP: ' + (i.sp || 0);
+                    if (pc.includes('bp')) t += ' | BP: ' + (i.bp || 0);
+                    t += '\n';
+                });
+                t += '-------------------------\n';
+                if (pc.includes('mrp')) t += 'Total MRP: Rs. ' + totalMrp.toFixed(2) + '\n';
+                if (pc.includes('sp')) t += 'Total SP: Rs. ' + totalSp.toFixed(2) + '\n';
+                if (pc.includes('bp')) t += '*TOTAL BP: ' + totalBp.toFixed(2) + '*\n';
+            } else if (custType === 'distributor') {
+                csbi.forEach(function(i, x) {
+                    var cleanName = cleanProductName(i.item_name || 'Unknown', custType);
+                    t += (x+1) + '. ' + cleanName + '\n';
+                    t += '   Qty: ' + (i.qty || 0) + ' | MRP: ' + (i.mrp || 0) + ' | BP: ' + (i.bp || 0) + '\n';
+                    t += '   Total MRP: Rs. ' + ((i.mrp || 0) * (i.qty || 0)).toFixed(2) + ' | Total BP: ' + ((i.bp || 0) * (i.qty || 0)).toFixed(2) + '\n';
+                });
+                t += '-------------------------\n';
+                t += 'Total MRP: Rs. ' + totalMrp.toFixed(2) + '\n';
+                t += '*TOTAL BP: ' + totalBp.toFixed(2) + '*\n';
+            } else {
+                csbi.forEach(function(i, x) {
+                    var cleanName = cleanProductName(i.item_name || 'Unknown', custType);
+                    t += (x+1) + '. ' + cleanName + '\n';
+                    t += '   Qty: ' + (i.qty || 0) + ' | MRP: ' + (i.mrp || 0) + ' | Total: Rs. ' + ((i.mrp || 0) * (i.qty || 0)).toFixed(2) + '\n';
+                });
+                t += '-------------------------\n';
+                t += '*TOTAL MRP: Rs. ' + totalMrp.toFixed(2) + '*\n';
+            }
+            t += 'Thank you!'; 
+            return t; 
+        }
+        
+        function gcm(m) { 
+            if (!m) return ''; 
+            const c = String(m).replace(/\D/g,''); 
+            if (c.length === 10) return '91' + c;
+            if (c.length === 12 && c.startsWith('91')) return c;
+            if (c.length === 13 && c.startsWith('91')) return c;
+            return c;
+        }
+        
+        async function shareViaWhatsApp() {
+            try {
+                var t = getBillText();
+                var m = gcm(csbill ? csbill.cust_mobile : '');
+                closeShareModal();
+                var waUrl = 'https://wa.me/' + m + '?text=' + encodeURIComponent(t);
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser) {
+                    await window.Capacitor.Plugins.Browser.open({ url: waUrl });
+                } else {
+                    window.open(waUrl, '_blank');
+                }
+            } catch (err) {
+                console.error('WhatsApp share error:', err);
+                alert('❌ Error: ' + err.message);
+            }
+        }
+        
+        async function shareViaSMS() {
+            try {
+                var t = getBillText();
+                var s = gcm(csbill ? csbill.cust_mobile : '');
+                if (s.startsWith('91') && s.length === 12) s = s.substring(2);
+                closeShareModal();
+                var smsUrl = 'sms:' + s + '?body=' + encodeURIComponent(t);
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser) {
+                    await window.Capacitor.Plugins.Browser.open({ url: smsUrl });
+                } else {
+                    window.open(smsUrl, '_blank');
+                }
+            } catch (err) {
+                console.error('SMS share error:', err);
+                alert('❌ Error: ' + err.message);
+            }
+        }
+        
+        // FIXED: PDF now works in Android app using Capacitor Filesystem
+        async function shareViaPDF() {
+            try { 
+                closeShareModal();
+                if (!csbill || !csbi) {
+                    alert('❌ Bill data not available');
+                    return;
+                }
+                
+                const {jsPDF} = window.jspdf, doc = new jsPDF();
+                const custType = csbill.customer_type || 'customer';
+                const pc = csbill.price_columns ? csbill.price_columns.split(',') : ['mrp','sp','bp'];
+                
+                doc.setFontSize(18); doc.setFont(undefined,'bold'); doc.text('SK AYURVEDAM WELLNESS CENTRE',105,20,{align:'center'});
+                doc.setFontSize(12); doc.setFont(undefined,'normal'); doc.text('KEVA SUPER STOCK POINT',105,28,{align:'center'});
+                doc.setDrawColor(44,62,80); doc.line(14,33,196,33);
+                doc.setFontSize(11); doc.setFont(undefined,'bold'); doc.text('Bill To:',14,42); doc.setFont(undefined,'normal'); doc.text(csbill.cust_name || 'N/A',14,48); doc.text('Type: ' + custType.toUpperCase(),14,54);
+                if(csbill.cust_mobile) doc.text('Mobile: '+csbill.cust_mobile,14,60);
+                doc.setFont(undefined,'bold'); doc.text('Bill Date:',140,42); doc.setFont(undefined,'normal'); doc.text(new Date(csbill.date).toLocaleDateString(),140,48); doc.text('Bill No: #'+csbill.id,140,54);
+                
+                let h, td, colStyles;
+                
+                if (custType === 'stockist') {
+                    h = [['#','ITEM','QTY']];
+                    colStyles = { 0:{cellWidth:10}, 1:{cellWidth:50}, 2:{cellWidth:12,halign:'center'} };
+                    let colIdx = 3;
+                    if(pc.includes('mrp')) { h[0].push('MRP','T.MRP'); colStyles[colIdx]={cellWidth:18,halign:'right'}; colStyles[colIdx+1]={cellWidth:20,halign:'right'}; colIdx+=2; }
+                    if(pc.includes('sp')) { h[0].push('SP','T.SP'); colStyles[colIdx]={cellWidth:18,halign:'right'}; colStyles[colIdx+1]={cellWidth:20,halign:'right'}; colIdx+=2; }
+                    if(pc.includes('bp')) { h[0].push('BP','T.BP'); colStyles[colIdx]={cellWidth:18,halign:'right'}; colStyles[colIdx+1]={cellWidth:20,halign:'right'}; }
+                    td = csbi.map((i,x)=>{
+                        const r = [x+1, i.item_name || 'Unknown', i.qty || 0];
+                        if(pc.includes('mrp')) r.push((i.mrp || 0).toFixed(2), ((i.mrp || 0) * (i.qty || 0)).toFixed(2));
+                        if(pc.includes('sp')) r.push((i.sp || 0).toFixed(2), ((i.sp || 0) * (i.qty || 0)).toFixed(2));
+                        if(pc.includes('bp')) r.push((i.bp || 0).toFixed(2), ((i.bp || 0) * (i.qty || 0)).toFixed(2));
+                        return r;
+                    });
+                } else if (custType === 'distributor') {
+                    h = [['#','ITEM NAME','QTY','MRP','T.MRP','BP','T.BP']];
+                    colStyles = { 0:{cellWidth:8}, 1:{cellWidth:55}, 2:{cellWidth:12,halign:'center'}, 3:{cellWidth:18,halign:'right'}, 4:{cellWidth:20,halign:'right'}, 5:{cellWidth:18,halign:'right'}, 6:{cellWidth:20,halign:'right'} };
+                    td = csbi.map((i,x) => {
+                        const cleanName = cleanProductName(i.item_name || 'Unknown', custType);
+                        return [x+1, cleanName, i.qty || 0, (i.mrp || 0).toFixed(2), ((i.mrp || 0) * (i.qty || 0)).toFixed(2), (i.bp || 0).toFixed(2), ((i.bp || 0) * (i.qty || 0)).toFixed(2)];
+                    });
+                } else {
+                    h = [['#','ITEM NAME','QTY','MRP','TOTAL']];
+                    colStyles = { 0:{cellWidth:10}, 1:{cellWidth:80}, 2:{cellWidth:15,halign:'center'}, 3:{cellWidth:25,halign:'right'}, 4:{cellWidth:30,halign:'right'} };
+                    td = csbi.map((i,x) => {
+                        const cleanName = cleanProductName(i.item_name || 'Unknown', custType);
+                        return [x+1, cleanName, i.qty || 0, (i.mrp || 0).toFixed(2), ((i.mrp || 0) * (i.qty || 0)).toFixed(2)];
+                    });
+                }
+                
+                doc.autoTable({startY:70, head:h, body:td, theme:'grid', headStyles:{fillColor:[44,62,80],textColor:255,fontSize:9}, bodyStyles:{fontSize:8}, columnStyles:colStyles, margin:{left:14,right:14}});
+                
+                const fy = doc.lastAutoTable.finalY + 10;
+                doc.setFontSize(11); let y = fy;
+                
+                if (custType === 'stockist') {
+                    if(pc.includes('mrp')){doc.setFont(undefined,'bold');doc.text('Total MRP:',130,y);doc.setFont(undefined,'normal');doc.text('Rs. '+(csbill.total_mrp||0).toFixed(2),196,y,{align:'right'});y+=7;}
+                    if(pc.includes('sp')){doc.setFont(undefined,'bold');doc.text('Total SP:',130,y);doc.setFont(undefined,'normal');doc.text('Rs. '+(csbill.total_sp||0).toFixed(2),196,y,{align:'right'});y+=7;}
+                    if(pc.includes('bp')){doc.setFontSize(13);doc.setFont(undefined,'bold');doc.text('Total BP:',130,y);doc.setTextColor(39,174,96);doc.text((csbill.total_bp||0).toFixed(2),196,y,{align:'right'});doc.setTextColor(0,0,0);y+=9;}
+                } else if (custType === 'distributor') {
+                    doc.setFont(undefined,'bold');doc.text('Total MRP:',130,y);doc.setFont(undefined,'normal');doc.text('Rs. '+(csbill.total_mrp||0).toFixed(2),196,y,{align:'right'});y+=7;
+                    doc.setFontSize(13);doc.setFont(undefined,'bold');doc.text('Total BP:',130,y);doc.setTextColor(39,174,96);doc.text((csbill.total_bp||0).toFixed(2),196,y,{align:'right'});doc.setTextColor(0,0,0);y+=9;
+                } else {
+                    doc.setFontSize(13); doc.setFont(undefined,'bold'); doc.text('Total MRP:',130,y);
+                    doc.setTextColor(39,174,96); doc.text('Rs. '+(csbill.total_mrp||0).toFixed(2),196,y,{align:'right'});
+                    doc.setTextColor(0,0,0); y+=9;
+                }
+                
+                doc.setFontSize(10); doc.setFont(undefined,'italic'); doc.text('Thank you for your business!', 105, y+10, {align:'center'});
+                
+                const fileName = 'Bill_'+(csbill.cust_name || 'Unknown').replace(/[^a-z0-9]/gi,'_')+'_'+custType+'_'+new Date(csbill.date).toISOString().split('T')[0]+'.pdf';
+                
+                // FIXED: Capacitor/Android PDF handling
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
+                    try {
+                        const FS = window.Capacitor.Plugins.Filesystem;
+                        
+                        // Get PDF as base64
+                        const pdfBase64 = doc.output('datauristring').split(',')[1];
+                        
+                        // Save to Cache directory (no permission needed)
+                        await FS.writeFile({
+                            path: fileName,
+                            data: pdfBase64,
+                            directory: 'CACHE',
+                            recursive: true
+                        });
+                        
+                        // Get file URI
+                        const uriResult = await FS.getUri({
+                            path: fileName,
+                            directory: 'CACHE'
+                        });
+                        
+                        // Try to share the PDF file
+                        if (window.Capacitor.Plugins.Share) {
+                            try {
+                                await window.Capacitor.Plugins.Share.share({
+                                    title: 'Bill Invoice',
+                                    text: 'Bill for ' + (csbill.cust_name || 'Customer'),
+                                    url: uriResult.uri,
+                                    dialogTitle: 'Share Bill PDF'
+                                });
+                                return;
+                            } catch (shareErr) {
+                                console.log('Share failed, trying browser:', shareErr);
+                            }
+                        }
+                        
+                        // Fallback: Open PDF in browser
+                        if (window.Capacitor.Plugins.Browser) {
+                            await window.Capacitor.Plugins.Browser.open({ url: uriResult.uri });
+                            return;
+                        }
+                        
+                        alert('✅ PDF saved to app cache: ' + fileName);
+                        return;
+                        
+                    } catch (fsErr) {
+                        console.log('Filesystem save failed, trying download:', fsErr);
+                    }
+                }
+                
+                // Browser fallback: Direct download
+                doc.save(fileName);
+                alert('✅ PDF downloaded: ' + fileName);
+                
+            } catch(e) { 
+                console.error('PDF Error:', e);
+                alert('❌ PDF Error: ' + e.message); 
+            }
+        }
+        
+        document.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('share-modal')) closeShareModal();
+            if (e.target === document.getElementById('edit-modal')) closeEditModal();
+        });
+
+        async function loadDatalists() {
+            await refreshDropdownCache();
+            setupSearchDropdown('cust-name','cust-list','customers','selectCustomer');
+            setupSearchDropdown('req-cust','cust-list-req','customers','selectReqCustomer');
+            setupSearchDropdown('prod-search','prod-list','products','selectProduct');
+            setupSearchDropdown('req-prod','prod-list-req','products','selectReqProduct');
+        }
+
+        let cart=[];
+        function renderCart() {
+            const m=document.getElementById('show-mrp').checked, s=document.getElementById('show-sp').checked, b=document.getElementById('show-bp').checked;
+            document.getElementById('cart-body').innerHTML = cart.map((i,x)=>{
+                let r=`<tr><td>${i.item_name}${i.qty>1?`<span class="qty-badge">x${i.qty}</span>`:''}</td>`; 
+                if(m)r+=`<td>${i.mrp.toFixed(2)}</td>`; 
+                if(s)r+=`<td>${i.sp.toFixed(2)}</td>`; 
+                if(b)r+=`<td>${i.bp.toFixed(2)}</td>`; 
+                r+=`<td><input type="number" value="${i.qty}" min="1" onchange="cart[${x}].qty=parseInt(this.value)||1;renderCart()" style="width:50px"></td>`; 
+                if(m)r+=`<td>${(i.mrp*i.qty).toFixed(2)}</td>`; 
+                if(s)r+=`<td>${(i.sp*i.qty).toFixed(2)}</td>`; 
+                if(b)r+=`<td>${(i.bp*i.qty).toFixed(2)}</td>`; 
+                r+=`<td><button class="btn btn-danger" style="width:auto;padding:5px" onclick="cart.splice(${x},1);renderCart()">✕</button></td></tr>`; 
+                return r;
+            }).join('');
+            let tm=0,ts=0,tb=0; cart.forEach(i=>{tm+=i.mrp*i.qty;ts+=i.sp*i.qty;tb+=i.bp*i.qty;});
+            const sg=document.getElementById('summary-grid'); sg.innerHTML='';
+            if(m) sg.innerHTML+=`<div class="col-mrp">💲 Total MRP<span>Rs. <span id="tot-mrp">${tm.toFixed(2)}</span></span></div>`;
+            if(s) sg.innerHTML+=`<div class="col-sp">🏷️ Total SP<span>Rs. <span id="tot-sp">${ts.toFixed(2)}</span></span></div>`;
+            if(b) sg.innerHTML+=`<div class="col-bp">💰 Total BP<span><span id="tot-bp">${tb.toFixed(2)}</span> BP</span></div>`;
+        }
+        async function saveBill() {
+            const n=document.getElementById('cust-name').value.trim(), mo=document.getElementById('cust-mobile').value.trim(), uc=document.getElementById('bill-update-mobile').checked;
+            const sm=document.getElementById('show-mrp').checked, ss=document.getElementById('show-sp').checked, sb=document.getElementById('show-bp').checked;
+            if(!n||cart.length===0) return alert('Enter customer and items');
+            const ct=getCustomerType(sm,ss,sb), pc=[]; if(sm)pc.push('mrp'); if(ss)pc.push('sp'); if(sb)pc.push('bp');
+            const cs=await DB.query('customers'); let c=findCustomer(cs,n,mo);
+            if(!c){const id=await DB.run('customers',{name:n,mobile:mo,customer_type:ct});c={id,name:n,mobile:mo,customer_type:ct};}
+            else{if(uc&&mo&&c.mobile!==mo){await DB.update('customers',c.id,{mobile});c.mobile=mo;}await DB.update('customers',c.id,{customer_type:ct});c.customer_type=ct;}
+            const tM=cart.reduce((s,i)=>s+i.mrp*i.qty,0), tS=cart.reduce((s,i)=>s+i.sp*i.qty,0), tB=cart.reduce((s,i)=>s+i.bp*i.qty,0);
+            const bid=await DB.run('bills',{customer_id:c.id,cust_name:n,cust_mobile:mo,customer_type:ct,date:new Date().toISOString(),total_mrp:tM,total_sp:tS,total_bp:tB,price_columns:pc.join(',')});
+            for(let i of cart) await DB.run('bill_items',{bill_id:bid,item_name:i.item_name,mrp:i.mrp,sp:i.sp,bp:i.bp,qty:i.qty,tot_mrp:i.mrp*i.qty,tot_sp:i.sp*i.qty,tot_bp:i.bp*i.qty});
+            alert(`✅ Bill Saved!\nType: ${ct.toUpperCase()}`); cart=[]; renderCart(); document.getElementById('cust-name').value=''; document.getElementById('cust-mobile').value=''; document.getElementById('customer-type-display').style.display='none'; resetUpdateMobile('bill'); 
+            await refreshDropdownCache();
+        }
+
+        let reqList=[];
+        function renderReq() { 
+            document.getElementById('req-body').innerHTML = reqList.map((i,x)=>`
+                <tr>
+                    <td>${i.item_name}${i.qty>1?`<span class="qty-badge">x${i.qty}</span>`:''}</td>
+                    <td><input type="number" value="${i.qty}" min="1" onchange="reqList[${x}].qty=parseInt(this.value)||1" style="width:50px"></td>
+                    <td><button class="btn btn-danger" style="width:auto;padding:5px" onclick="reqList.splice(${x},1);renderReq()">✕</button></td>
+                </tr>`).join(''); 
+        }
+        async function saveRequirement() {
+            const c=document.getElementById('req-cust').value.trim(), mo=document.getElementById('req-mobile').value.trim(), ct=document.getElementById('req-customer-type').value, uc=document.getElementById('req-update-mobile').checked;
+            if(!c||reqList.length===0) return alert('Enter customer and items');
+            const cs=await DB.query('customers'); let co=findCustomer(cs,c,mo);
+            if(!co){const id=await DB.run('customers',{name:c,mobile:mo,customer_type:ct});co={id,name:c,mobile:mo,customer_type:ct};}
+            else{if(uc&&mo&&co.mobile!==mo) await DB.update('customers',co.id,{mobile}); await DB.update('customers',co.id,{customer_type:ct});}
+            for(let i of reqList) await DB.run('requirements',{customer:c,mobile:mo,customer_type:ct,item_name:i.item_name,qty:i.qty,date:new Date().toISOString()});
+            alert(`✅ Saved!\nType: ${ct.toUpperCase()}`); reqList=[]; renderReq(); document.getElementById('req-cust').value=''; document.getElementById('req-mobile').value=''; document.getElementById('req-customer-type').value='customer'; resetUpdateMobile('req'); loadRequirementCustomers(); 
+            await refreshDropdownCache();
+        }
+
+        function toggleDebug() { document.getElementById('debug-box').style.display=document.getElementById('debug-box').style.display==='none'?'block':'none'; }
+        async function handleFileUpload(e) { const f=e.target.files[0]; if(!f) return; document.getElementById('debug-box').innerText=''; document.getElementById('upload-status').innerText=`📂 Reading ${f.name}...`; document.getElementById('upload-status').style.color='blue'; let items=[]; try { if(f.name.endsWith('.pdf')) items=await parsePDF(f); else items=await parseExcel(f); if(items.length>0){await DB.clear('products'); for(let i of items) await DB.run('products',i); document.getElementById('upload-status').innerText=`✅ Loaded ${items.length} PDF products.`; document.getElementById('upload-status').style.color='green'; await refreshDropdownCache();} else{document.getElementById('upload-status').innerText='⚠️ 0 Products found.'; document.getElementById('upload-status').style.color='red';} } catch(err){document.getElementById('upload-status').innerText=`❌ ${err.message}`; document.getElementById('upload-status').style.color='red';} }
+        async function parsePDF(f) { const ab=await f.arrayBuffer(); pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; const pdf=await pdfjsLib.getDocument({data:ab}).promise; let items=[],rt=''; for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i),tc=await p.getTextContent(),ls={}; tc.items.forEach(it=>{if(!it.str)return;const y=Math.round(it.transform[5]);if(!ls[y])ls[y]=[];ls[y].push({x:it.transform[4],str:it.str});}); Object.keys(ls).sort((a,b)=>b-a).forEach(y=>{const lt=ls[y].sort((a,b)=>a.x-b.x).map(i=>i.str).join(' ').trim();if(lt)rt+=lt+'\n';});} if(!rt.trim())return[]; rt.split('\n').forEach(l=>{l=l.replace(/^\d+\s*/,'');const n=l.match(/[\d,]+\.?\d*/g);if(n&&n.length>=3){const bp=parseFloat(n[n.length-1].replace(/,/g,'')),sp=parseFloat(n[n.length-2].replace(/,/g,'')),mrp=parseFloat(n[n.length-3].replace(/,/g,'')),tln=n[n.length-3],ni=l.lastIndexOf(tln);let nm=l.substring(0,ni).replace(/[-–—:.\s]+$/,'').trim();if(nm&&nm.length>1&&!nm.match(/^\d+$/))items.push({item_name:nm,mrp,sp,bp});}}); return items; }
+        function parseExcel(f) { return new Promise(r=>{const rd=new FileReader();rd.onload=function(e){const d=new Uint8Array(e.target.result),wb=XLSX.read(d,{type:'array'}),sh=wb.Sheets[wb.SheetNames[0]],j=XLSX.utils.sheet_to_json(sh,{header:1});r(j.slice(1).filter(r=>r.length>=4&&r[0]).map(r=>({item_name:String(r[0]).trim(),mrp:parseFloat(String(r[1]).replace(/,/g,''))||0,sp:parseFloat(String(r[2]).replace(/,/g,''))||0,bp:parseFloat(String(r[3]).replace(/,/g,''))||0})));};rd.readAsArrayBuffer(f);}); }
+        async function clearProducts() { if(confirm('⚠️ Clear all PDF/Excel products?\n\n✅ Manual products (⭐) will NOT be deleted.')){await DB.clear('products');document.getElementById('upload-status').innerText='✅ PDF products cleared.';await refreshDropdownCache();} }
+
+        async function setupBackButton() { if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App){try{const App=window.Capacitor.Plugins.App;await App.addListener('backButton',()=>{if(document.getElementById('share-modal').style.display==='block'){closeShareModal();return;}if(document.getElementById('edit-modal').style.display==='block'){closeEditModal();return;}if(document.getElementById('history-detail-view').style.display==='block'){goBackToCustomers();return;}if(document.getElementById('req-detail-view').style.display==='block'){goBackToReqCustomers();return;}if(confirm('⚠️ Exit SK Ayurvedam app?'))App.exitApp();});}catch(e){console.error(e);} } }
+
+        async function exportData() {
+            try { 
+                const se = document.getElementById('backup-status'); 
+                se.innerText = '⏳ Creating backup...'; 
+                se.style.color = 'orange';
+                let bd = {}; 
+                if (DB.isCapacitor && DB.conn) {
+                    bd = {
+                        version: '1.1',
+                        exportDate: new Date().toISOString(),
+                        customers: await DB.query('customers'),
+                        products: await DB.query('products'),
+                        manual_products: await DB.query('manual_products'),
+                        bills: await DB.query('bills'),
+                        bill_items: await DB.query('bill_items'),
+                        requirements: await DB.query('requirements')
+                    };
+                } else {
+                    bd = { version: '1.1', exportDate: new Date().toISOString(), ...DB.data };
+                }
+                const jsonStr = JSON.stringify(bd, null, 2);
+                const fileName = `SKA_Backup_${new Date().toISOString().split('T')[0]}.json`;
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
+                    try {
+                        const FS = window.Capacitor.Plugins.Filesystem;
+                        const Dir = FS.Directory || { Documents: 'DOCUMENTS' };
+                        const Enc = FS.Encoding || { UTF8: 'utf8' };
+                        await FS.writeFile({
+                            path: fileName,
+                            data: jsonStr,
+                            directory: Dir.Documents || 'DOCUMENTS',
+                            encoding: Enc.UTF8 || 'utf8',
+                            recursive: true
+                        });
+                        const uri = await FS.getUri({
+                            path: fileName,
+                            directory: Dir.Documents || 'DOCUMENTS'
+                        });
+                        if (window.Capacitor.Plugins.Share) {
+                            await window.Capacitor.Plugins.Share.share({
+                                title: 'SK Ayurvedam Backup',
+                                text: `Backup: ${bd.customers.length} customers`,
+                                url: uri.uri,
+                                dialogTitle: 'Save Backup'
+                            });
+                        }
+                        se.innerText = '✅ Backup saved!'; 
+                        se.style.color = 'green';
+                        alert(`✅ Saved!\n\n📁 ${fileName}\n📍 Documents folder`);
+                        return;
+                    } catch (e) {
+                        console.log('Filesystem failed:', e);
+                    }
+                }
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Share) {
+                    try {
+                        await window.Capacitor.Plugins.Share.share({
+                            title: 'SK Ayurvedam Backup',
+                            text: jsonStr,
+                            dialogTitle: 'Share Backup'
+                        });
+                        se.innerText = '✅ Backup shared!';
+                        se.style.color = 'green';
+                        return;
+                    } catch (shareErr) {
+                        console.log('Share failed:', shareErr);
+                    }
+                }
+                const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+                const file = new File([blob], fileName, { type: 'application/json;charset=utf-8' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: 'Backup' });
+                    se.innerText = '✅ Shared!';
+                    se.style.color = 'green';
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    se.innerText = `✅ Downloaded: ${fileName}`;
+                    se.style.color = 'green';
+                }
+            } catch (e) {
+                console.error('Export error:', e);
+                document.getElementById('backup-status').innerText = `❌ ${e.message}`;
+                document.getElementById('backup-status').style.color = 'red';
+                alert('❌ Export failed: ' + e.message);
+            }
+        }
+        
+        async function importData(e) {
+            const f = e.target.files[0]; 
+            if (!f) return; 
+            const se = document.getElementById('backup-status');
+            if (!confirm(`⚠️ REPLACE all data?\n\n📁 ${f.name}\n📏 ${(f.size / 1024).toFixed(2)} KB\n\nThis will replace ALL current data with the backup.`)) {
+                e.target.value = '';
+                return;
+            }
+            try { 
+                se.innerText = '⏳ Reading...'; 
+                se.style.color = 'orange'; 
+                const t = await f.text(); 
+                let bd; 
+                try {
+                    bd = JSON.parse(t);
+                } catch (pe) {
+                    throw new Error('Invalid JSON format. Please select a valid backup file.');
+                }
+                if (!bd.version || !bd.customers || !Array.isArray(bd.customers)) {
+                    throw new Error('Invalid backup file format. Missing required data.');
+                }
+                se.innerText = '⏳ Restoring...'; 
+                await DB.clear('customers');
+                await DB.clear('products');
+                await DB.clear('manual_products');
+                await DB.clear('bills');
+                await DB.clear('bill_items');
+                await DB.clear('requirements');
+                let cn = { c: 0, p: 0, mp: 0, b: 0, bi: 0, r: 0 };
+                if (bd.customers) for (let i of bd.customers) { delete i.id; await DB.run('customers', i); cn.c++; }
+                if (bd.products) for (let i of bd.products) { delete i.id; await DB.run('products', i); cn.p++; }
+                if (bd.manual_products) for (let i of bd.manual_products) { delete i.id; await DB.run('manual_products', i); cn.mp++; }
+                if (bd.bills) for (let i of bd.bills) { delete i.id; await DB.run('bills', i); cn.b++; }
+                if (bd.bill_items) for (let i of bd.bill_items) { delete i.id; await DB.run('bill_items', i); cn.bi++; }
+                if (bd.requirements) for (let i of bd.requirements) { delete i.id; await DB.run('requirements', i); cn.r++; }
+                se.innerText = `✅ Restored!`; 
+                se.style.color = 'green'; 
+                await refreshDropdownCache();
+                loadHistoryCustomers();
+                loadRequirementCustomers();
+                loadManualProducts();
+                alert(`✅ Backup restored successfully!\n\n👤 ${cn.c} customers\n📦 ${cn.p} PDF products\n⭐ ${cn.mp} manual products\n🧾 ${cn.b} bills\n📋 ${cn.bi} bill items\n📝 ${cn.r} requirements`);
+            } catch (err) {
+                console.error('Import error:', err);
+                se.innerText = `❌ ${err.message}`;
+                se.style.color = 'red';
+                alert('❌ Import failed: ' + err.message);
+            }
+            e.target.value = '';
+        }
+
+        function switchSettingsPanel(panel, btn) {
+            document.querySelectorAll('.settings-submenu button').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('panel-' + panel).classList.add('active');
+            if (panel === 'manual') loadManualProducts();
+        }
+
+        async function addManualProduct() {
+            const name = document.getElementById('manual-prod-name').value.trim();
+            const mrp = parseFloat(document.getElementById('manual-prod-mrp').value) || 0;
+            const sp = parseFloat(document.getElementById('manual-prod-sp').value) || 0;
+            const bp = parseFloat(document.getElementById('manual-prod-bp').value) || 0;
+            if (!name) { alert('⚠️ Please enter product name'); return; }
+            if (mrp <= 0 && sp <= 0 && bp <= 0) { alert('⚠️ Please enter at least one price'); return; }
+            const existing = await DB.query('manual_products');
+            if (existing.find(p => p.item_name.toLowerCase() === name.toLowerCase())) {
+                if (!confirm(`⚠️ Product "${name}" already exists.\n\nOverwrite?`)) return;
+                const dup = existing.find(p => p.item_name.toLowerCase() === name.toLowerCase());
+                await DB.delete('manual_products', dup.id);
+            }
+            await DB.run('manual_products', { item_name: name, mrp, sp, bp });
+            document.getElementById('manual-prod-name').value = '';
+            document.getElementById('manual-prod-mrp').value = '';
+            document.getElementById('manual-prod-sp').value = '';
+            document.getElementById('manual-prod-bp').value = '';
+            alert(`✅ Manual product added!\n\n⭐ ${name}`);
+            loadManualProducts();
+            await refreshDropdownCache();
+        }
+
+        async function loadManualProducts() {
+            const prods = await DB.query('manual_products');
+            const list = document.getElementById('manual-products-list');
+            if (!list) return;
+            if (prods.length === 0) { list.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">No manual products yet.</p>'; return; }
+            list.innerHTML = prods.sort((a,b) => a.item_name.localeCompare(b.item_name)).map(p => `
+                <div class="manual-prod-item">
+                    <div class="prod-info">
+                        <div class="prod-name">⭐ ${p.item_name}</div>
+                        <div class="prod-prices">💲 MRP: ${p.mrp.toFixed(2)} | 🏷️ SP: ${p.sp.toFixed(2)} | 💰 BP: ${p.bp.toFixed(2)}</div>
+                    </div>
+                    <button class="btn btn-danger btn-small" onclick="deleteManualProduct(${p.id}, '${p.item_name.replace(/'/g,"\\'")}')"><span class="btn-icon">🗑️</span></button>
+                </div>
+            `).join('');
+        }
+
+        async function deleteManualProduct(id, name) {
+            if (!confirm(`⚠️ Delete manual product?\n\n⭐ ${name}`)) return;
+            await DB.delete('manual_products', id);
+            alert('✅ Deleted!');
+            loadManualProducts();
+            await refreshDropdownCache();
+        }
+
+        DB.init().then(async ()=>{
+            await refreshDropdownCache();
+            loadDatalists();
+            loadHistoryCustomers();
+            loadRequirementCustomers();
+            setupBackButton();
+            setupAutoClear('cust-name','cust-mobile','bill');
+            setupAutoClear('req-cust','req-mobile','req');
+            loadManualProducts();
+        });
+    </script>
+</body>
+</html>
