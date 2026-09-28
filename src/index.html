@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SK Ayurvedam</title>
+    <title>SK Aayurveda</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -14,9 +14,9 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
         .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 16px 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .header h2 { margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: 0.5px; }
-        .header .subtitle { font-size: 0.75rem; color: #a8d8ea; margin-top: 3px; letter-spacing: 1px; }
-        .tabs { display: flex; background: #fff; border-bottom: 1px solid #e8e8e8; position: sticky; top: 62px; z-index: 99; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .header h2 { margin: 0; font-size: 1.3rem; font-weight: 700; letter-spacing: 1px; }
+        .header .subtitle { font-size: 0.75rem; color: #a8d8ea; margin-top: 3px; letter-spacing: 1.5px; }
+        .tabs { display: flex; background: #fff; border-bottom: 1px solid #e8e8e8; position: sticky; top: 68px; z-index: 99; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .tab-btn { flex: 1; padding: 10px 5px; border: none; background: none; font-weight: 600; color: #888; cursor: pointer; border-bottom: 3px solid transparent; font-size: 0.78rem; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: all 0.2s ease; }
         .tab-btn .tab-icon { font-size: 1.3rem; }
         .tab-btn.active { color: #0f3460; border-bottom: 3px solid #e94560; background: #fafbfc; }
@@ -45,7 +45,11 @@
         .btn-export { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
         .btn-import { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; }
         .btn-edit { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; }
+        .btn-done { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; }
+        .btn-add { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; }
         .btn-small { padding: 8px 12px; font-size: 0.82rem; width: auto; margin-top: 5px; display: inline-flex; }
+        .btn-disabled { background: #bdc3c7 !important; color: #7f8c8d !important; cursor: not-allowed !important; opacity: 0.6; }
+        .btn-disabled:active { transform: none !important; }
         .table-wrap { overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid #eee; }
         table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 600px; }
         th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
@@ -60,6 +64,7 @@
         .month-card .m-val { font-weight: bold; color: #1a1a2e; font-size: 1rem; margin-top: 3px; }
         .bill-item, .cust-item { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.2s; border: 1px solid #f0f0f0; border-left: 4px solid #27ae60; }
         .bill-item:active, .cust-item:active { transform: scale(0.98); background: #f8f9fa; }
+        .bill-item.completed { border-left-color: #95a5a6; background: #f8f9fa; opacity: 0.85; }
         .cust-item-req { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.2s; border: 1px solid #f0f0f0; border-left: 4px solid #f39c12; }
         .cust-item-req:active { transform: scale(0.98); background: #f8f9fa; }
         .req-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px; border-radius: 8px; margin-bottom: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; border-left: 4px solid #f39c12; }
@@ -68,6 +73,12 @@
         .type-stockist { background: #e8f5e9; color: #2e7d32; border: 2px solid #4caf50; }
         .type-distributor { background: #fff3e0; color: #e65100; border: 2px solid #ff9800; }
         .type-customer { background: #e3f2fd; color: #1565c0; border: 2px solid #2196f3; }
+        .bill-number-badge { display: inline-block; background: #0f3460; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: bold; margin-left: 6px; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; }
+        .bill-number-badge:hover { background: #e94560; transform: scale(1.05); }
+        .bill-number-badge:active { transform: scale(0.95); }
+        .bp-status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: bold; text-transform: uppercase; margin-left: 4px; }
+        .bp-pending { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+        .bp-done { background: #d4edda; color: #155724; border: 1px solid #28a745; }
         .update-mobile-wrap { display: flex; align-items: center; background: #fff8e1; border: 1.5px dashed #f39c12; padding: 10px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
         .update-mobile-wrap input[type="checkbox"] { width: auto; margin: 0 10px 0 0; transform: scale(1.3); cursor: pointer; }
         .update-mobile-wrap label { margin: 0; font-size: 0.85rem; color: #e67e22; font-weight: 600; cursor: pointer; flex: 1; }
@@ -94,6 +105,7 @@
         .modal-content { background: #fff; margin: 5% auto; padding: 20px; border-radius: 16px; width: 92%; max-width: 600px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .modal-content h3 { margin: 0 0 10px 0; text-align: center; color: #1a1a2e; }
         .modal-close { float: right; font-size: 1.5rem; cursor: pointer; color: #999; margin-top: -5px; }
+        .modal-close:hover { color: #e74c3c; }
         .share-options { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
         .share-options .btn { margin-top: 0; }
         #debug-box { display:none; background:#1a1a2e; color:#0f0; padding:12px; margin-top:10px; max-height:300px; overflow:auto; font-size:11px; border-radius:8px; white-space:pre-wrap; font-family: monospace; }
@@ -108,21 +120,46 @@
         .manual-prod-item .prod-name { font-weight: 600; color: #1a1a2e; }
         .manual-prod-item .prod-prices { font-size: 0.78rem; color: #666; margin-top: 2px; }
         .manual-badge { display: inline-block; background: #f39c12; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.65rem; font-weight: bold; margin-left: 5px; }
-        .edit-item-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; padding: 8px; background: #f8f9fa; border-radius: 6px; margin-bottom: 6px; align-items: center; }
+        .edit-item-row { display: grid; grid-template-columns: 2fr 1fr auto; gap: 8px; padding: 8px; background: #f8f9fa; border-radius: 6px; margin-bottom: 6px; align-items: center; }
         .edit-item-row .item-name { font-weight: 600; font-size: 0.85rem; }
         .edit-item-row input { margin-bottom: 0; padding: 6px 8px; font-size: 0.85rem; }
+        .edit-item-row .remove-btn { background: #e74c3c; color: white; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-weight: bold; }
         .settings-submenu { display: flex; gap: 8px; margin-bottom: 12px; border-bottom: 2px solid #eee; }
         .settings-submenu button { flex: 1; padding: 10px; border: none; background: none; cursor: pointer; font-weight: 600; color: #888; border-bottom: 3px solid transparent; font-size: 0.85rem; }
         .settings-submenu button.active { color: #0f3460; border-bottom-color: #e94560; }
         .settings-panel { display: none; }
         .settings-panel.active { display: block; }
         .qty-badge { display: inline-block; background: #0f3460; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; margin-left: 5px; }
+        .add-product-section { background: #e8f4f8; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1.5px solid #b3d9e8; }
+        .add-product-section h4 { font-size: 0.9rem; color: #0f3460; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        
+        /* NEW: View Bill Details Modal Styles */
+        .view-bill-header { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
+        .view-bill-header .company-name { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+        .view-bill-header .company-sub { font-size: 0.75rem; color: #a8d8ea; margin-top: 2px; letter-spacing: 1px; }
+        .view-bill-header .bill-no { font-size: 1.1rem; font-weight: bold; margin-top: 8px; background: rgba(255,255,255,0.15); padding: 5px 15px; border-radius: 20px; display: inline-block; }
+        .view-bill-info { background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+        .view-bill-info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e0e0e0; }
+        .view-bill-info-row:last-child { border-bottom: none; }
+        .view-bill-info-row .label { color: #666; font-size: 0.85rem; font-weight: 600; }
+        .view-bill-info-row .value { color: #1a1a2e; font-size: 0.9rem; font-weight: 600; }
+        .view-bill-items { margin-top: 12px; }
+        .view-bill-items table { font-size: 0.8rem; width: 100%; }
+        .view-bill-items th { background: #0f3460; color: white; padding: 8px 6px; font-size: 0.72rem; }
+        .view-bill-items td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; }
+        .view-bill-items tr:nth-child(even) { background: #f8f9fa; }
+        .view-bill-total { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); padding: 12px; border-radius: 8px; margin-top: 12px; border: 1px solid #a5d6a7; }
+        .view-bill-total-row { display: flex; justify-content: space-between; padding: 4px 0; }
+        .view-bill-total-row.main { font-size: 1.1rem; font-weight: bold; color: #2e7d32; border-top: 2px solid #4caf50; padding-top: 8px; margin-top: 4px; }
+        .view-bill-footer { text-align: center; margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; }
+        .view-bill-footer .thank-you { font-style: italic; color: #666; font-size: 0.9rem; }
+        .view-bill-footer .visit-again { font-weight: bold; color: #27ae60; font-size: 1rem; margin-top: 4px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2>🏥 SK AYURVEDAM WELLNESS CENTRE</h2>
+        <h2>🕉️ SK AAYURVEDA</h2>
         <div class="subtitle">KEVA SUPER STOCK POINT</div>
     </div>
 
@@ -313,6 +350,14 @@
         </div>
     </div>
 
+    <!-- NEW: View Bill Details Modal -->
+    <div id="view-bill-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeViewBillModal()">&times;</span>
+            <div id="view-bill-content"></div>
+        </div>
+    </div>
+
     <script>
         const DB = {
             isCapacitor: window.Capacitor !== undefined,
@@ -326,13 +371,39 @@
                         await this.conn.open();
                         await this.conn.execute(`CREATE TABLE IF NOT EXISTS customers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, mobile TEXT, customer_type TEXT)`);
                         await this.conn.execute(`CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, item_name TEXT, mrp REAL, sp REAL, bp REAL)`);
-                        await this.conn.execute(`CREATE TABLE IF NOT EXISTS bills (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id INTEGER, cust_name TEXT, cust_mobile TEXT, customer_type TEXT, date TEXT, total_mrp REAL, total_sp REAL, total_bp REAL, price_columns TEXT)`);
+                        await this.conn.execute(`CREATE TABLE IF NOT EXISTS bills (id INTEGER PRIMARY KEY AUTOINCREMENT, bill_number TEXT, customer_id INTEGER, cust_name TEXT, cust_mobile TEXT, customer_type TEXT, date TEXT, total_mrp REAL, total_sp REAL, total_bp REAL, price_columns TEXT, bp_status TEXT)`);
                         await this.conn.execute(`CREATE TABLE IF NOT EXISTS bill_items (id INTEGER PRIMARY KEY AUTOINCREMENT, bill_id INTEGER, item_name TEXT, mrp REAL, sp REAL, bp REAL, qty INTEGER, tot_mrp REAL, tot_sp REAL, tot_bp REAL)`);
                         await this.conn.execute(`CREATE TABLE IF NOT EXISTS requirements (id INTEGER PRIMARY KEY AUTOINCREMENT, customer TEXT, mobile TEXT, customer_type TEXT, item_name TEXT, qty INTEGER, date TEXT)`);
                         await this.conn.execute(`CREATE TABLE IF NOT EXISTS manual_products (id INTEGER PRIMARY KEY AUTOINCREMENT, item_name TEXT, mrp REAL, sp REAL, bp REAL)`);
                         try { await this.conn.execute(`ALTER TABLE requirements ADD COLUMN customer_type TEXT`); } catch (e) {}
                         try { await this.conn.execute(`ALTER TABLE customers ADD COLUMN customer_type TEXT`); } catch (e) {}
+                        try { await this.conn.execute(`ALTER TABLE bills ADD COLUMN bill_number TEXT`); } catch (e) {}
+                        try { await this.conn.execute(`ALTER TABLE bills ADD COLUMN bp_status TEXT`); } catch (e) {}
+                        try {
+                            const existingBills = await this.conn.query(`SELECT id FROM bills WHERE bill_number IS NULL OR bill_number = ''`);
+                            if (existingBills.values && existingBills.values.length > 0) {
+                                for (let i = 0; i < existingBills.values.length; i++) {
+                                    const billId = existingBills.values[i].id;
+                                    const billNum = 'SKAA' + String(i + 1).padStart(4, '0');
+                                    await this.conn.execute(`UPDATE bills SET bill_number = ?, bp_status = COALESCE(bp_status, 'pending') WHERE id = ?`, [billNum, billId]);
+                                }
+                            }
+                            await this.conn.execute(`UPDATE bills SET bp_status = 'pending' WHERE bp_status IS NULL OR bp_status = ''`);
+                        } catch (e) { console.log('Migration note:', e); }
                     } catch (err) { this.isCapacitor = false; }
+                } else {
+                    if (this.data.bills) {
+                        let counter = 1;
+                        this.data.bills.forEach(b => {
+                            if (!b.bill_number) {
+                                b.bill_number = 'SKAA' + String(counter++).padStart(4, '0');
+                            }
+                            if (!b.bp_status) {
+                                b.bp_status = 'pending';
+                            }
+                        });
+                        localStorage.setItem('ska_db', JSON.stringify(this.data));
+                    }
                 }
                 if (!this.data.manual_products) { this.data.manual_products = []; localStorage.setItem('ska_db', JSON.stringify(this.data)); }
             },
@@ -351,6 +422,22 @@
                 else { this.data[table] = this.data[table].filter(r => r.id.toString() !== id.toString()); localStorage.setItem('ska_db', JSON.stringify(this.data)); }
             }
         };
+
+        async function generateBillNumber() {
+            const bills = await DB.query('bills');
+            let maxNum = 0;
+            bills.forEach(b => {
+                if (b.bill_number && b.bill_number.startsWith('SKAA')) {
+                    const num = parseInt(b.bill_number.substring(4));
+                    if (!isNaN(num) && num > maxNum) maxNum = num;
+                }
+            });
+            return 'SKAA' + String(maxNum + 1).padStart(4, '0');
+        }
+
+        function getBillNum(bill) {
+            return bill.bill_number || ('SKAA' + String(bill.id).padStart(4, '0'));
+        }
 
         function cleanProductName(name, customerType) {
             if (customerType === 'stockist') return name;
@@ -428,6 +515,87 @@
                 }
                 list.classList.add('show');
             }
+        }
+
+        function setupEditProductSearch() {
+            const input = document.getElementById('edit-prod-search');
+            const list = document.getElementById('edit-prod-list');
+            if (!input || !list) return;
+            
+            let debounceTimer;
+            function renderWithDebounce() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => renderEditDD(), 50);
+            }
+            
+            input.addEventListener('focus', renderWithDebounce);
+            input.addEventListener('input', renderWithDebounce);
+            input.addEventListener('blur', () => { setTimeout(() => list.classList.remove('show'), 200); });
+            
+            function renderEditDD() {
+                const data = dropdownCache.products;
+                const f = input.value.toLowerCase();
+                const filtered = data.filter(i => i.name.toLowerCase().includes(f) || (i.detail && i.detail.toLowerCase().includes(f)));
+                list.innerHTML = filtered.length > 0 ? filtered.slice(0, 30).map(i => `
+                    <div class="dropdown-item" onclick="addProductToEditBill('${i.name.replace(/'/g,"\\'")}')">
+                        <div class="item-name">${i.name}${i.source==='manual'?'<span class="manual-badge">⭐ MANUAL</span>':''}</div>
+                        <div class="item-detail">${i.detail}</div>
+                    </div>
+                `).join('') : '<div class="dropdown-item" style="color:#999;">No matches found</div>';
+                list.classList.add('show');
+            }
+        }
+
+        function addProductToEditBill(productName) {
+            const p = dropdownCache.products.find(x => x.name === productName);
+            if (!p) return;
+            
+            const existing = editingItems.find(i => i.item_name === p.name);
+            if (existing) {
+                existing.qty = (existing.qty || 0) + 1;
+            } else {
+                const mrp = parseFloat(p.detail.match(/MRP: ([\d.]+)/)[1]) || 0;
+                const sp = parseFloat(p.detail.match(/SP: ([\d.]+)/)[1]) || 0;
+                const bp = parseFloat(p.detail.match(/BP: ([\d.]+)/)[1]) || 0;
+                editingItems.push({
+                    item_name: p.name,
+                    mrp: mrp,
+                    sp: sp,
+                    bp: bp,
+                    qty: 1,
+                    isNew: true
+                });
+            }
+            
+            document.getElementById('edit-prod-search').value = '';
+            document.getElementById('edit-prod-list').classList.remove('show');
+            renderEditItemsList();
+        }
+
+        function removeProductFromEdit(idx) {
+            if (confirm('Remove this product from the bill?')) {
+                editingItems.splice(idx, 1);
+                renderEditItemsList();
+            }
+        }
+
+        function renderEditItemsList() {
+            const listEl = document.getElementById('edit-items-list');
+            if (!listEl) return;
+            
+            let html = '';
+            editingItems.forEach((item, idx) => {
+                const isNew = item.isNew ? '<span class="manual-badge" style="background:#9b59b6;">NEW</span>' : '';
+                html += `<div class="edit-item-row">
+                        <div>
+                            <div class="item-name">${item.item_name || 'Unknown'} ${isNew}</div>
+                            <div style="font-size:0.75rem;color:#666;">MRP: ${item.mrp || 0} | SP: ${item.sp || 0} | BP: ${item.bp || 0}</div>
+                        </div>
+                        <input type="number" value="${item.qty || 1}" min="1" onchange="editingItems[${idx}].qty=parseInt(this.value)||1" style="width:70px;">
+                        <button class="remove-btn" onclick="removeProductFromEdit(${idx})">✕</button>
+                    </div>`;
+            });
+            listEl.innerHTML = html || '<p style="text-align:center;color:#888;padding:10px;">No items in bill</p>';
         }
 
         function selectCustomer(name, mobile, type, detail, source) {
@@ -606,20 +774,53 @@
             bills.forEach(b => { const d=new Date(b.date), mk=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; if(!mt[mk]) mt[mk]=0; mt[mk]+=(b.total_bp||0); });
             const mn=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
             document.getElementById('monthly-summary').innerHTML = Object.keys(mt).sort().reverse().map(k => { const [y,m]=k.split('-'); return `<div class="month-card"><div class="m-label">${mn[parseInt(m)-1]} ${y}</div><div class="m-val">${mt[k].toFixed(2)} BP</div></div>`; }).join('') || '<p>No data</p>';
+            
+            // UPDATED: Bill number badge is now clickable to view details
             document.getElementById('detail-bill-list').innerHTML = bills.map(b => { 
-                const tc=`type-${b.customer_type||'customer'}`, tl=(b.customer_type||'customer').toUpperCase(); 
-                return `<div class="bill-item" style="cursor:default;">
-                    <span class="customer-type-badge ${tc}" style="font-size:0.65rem;padding:2px 8px;float:right;">${tl}</span>
-                    <span style="float:right;font-weight:bold;color:#27ae60;margin-right:10px;">${(b.total_bp||0).toFixed(2)} BP</span>
-                    <strong>📅 ${new Date(b.date).toLocaleDateString()}</strong>
-                    <div style="color:#666;font-size:0.82rem;margin-top:4px;">💲 MRP: Rs. ${(b.total_mrp||0).toFixed(2)} | 🏷️ SP: Rs. ${(b.total_sp||0).toFixed(2)}</div>
+                const tc=`type-${b.customer_type||'customer'}`, tl=(b.customer_type||'customer').toUpperCase();
+                const bpStatus = b.bp_status || 'pending';
+                const billNum = getBillNum(b);
+                const isCompleted = bpStatus === 'done';
+                const billItemClass = isCompleted ? 'bill-item completed' : 'bill-item';
+                
+                return `<div class="${billItemClass}" style="cursor:default;">
+                    <div style="margin-bottom:6px;">
+                        <span class="bill-number-badge" onclick="viewBillDetails(${b.id})" title="Click to view bill details">#${billNum}</span>
+                        <span class="customer-type-badge ${tc}" style="font-size:0.65rem;padding:2px 8px;">${tl}</span>
+                        <span class="bp-status-badge ${isCompleted ? 'bp-done' : 'bp-pending'}">${isCompleted ? '✅ BP DONE' : '⏳ BP PENDING'}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+                        <div>
+                            <strong>📅 ${new Date(b.date).toLocaleDateString()}</strong>
+                            <div style="color:#666;font-size:0.82rem;margin-top:4px;">💲 MRP: Rs. ${(b.total_mrp||0).toFixed(2)} | 💰 BP: ${(b.total_bp||0).toFixed(2)}</div>
+                        </div>
+                        <div style="font-weight:bold;color:#27ae60;font-size:1.1rem;">${(b.total_bp||0).toFixed(2)} BP</div>
+                    </div>
                     <div class="bill-actions">
-                        <button class="btn btn-edit btn-small" onclick="openEditModal(${b.id})"><span class="btn-icon">✏️</span> Edit</button>
+                        ${isCompleted 
+                            ? `<button class="btn btn-edit btn-small btn-disabled" disabled><span class="btn-icon">✏️</span> Edit</button>
+                               <button class="btn btn-danger btn-small btn-disabled" disabled><span class="btn-icon">🗑️</span> Delete</button>`
+                            : `<button class="btn btn-edit btn-small" onclick="openEditModal(${b.id})"><span class="btn-icon">✏️</span> Edit</button>
+                               <button class="btn btn-danger btn-small" onclick="deleteBill(${b.id},'${name.replace(/'/g,"\\'")}','${(mobile||'').replace(/'/g,"\\'")}')"><span class="btn-icon">🗑️</span> Delete</button>
+                               <button class="btn btn-done btn-small" onclick="markBpDone(${b.id},'${name.replace(/'/g,"\\'")}','${(mobile||'').replace(/'/g,"\\'")}')"><span class="btn-icon">✅</span> BP Done</button>`
+                        }
                         <button class="btn btn-share btn-small" onclick="openShareModal(${b.id})"><span class="btn-icon">📤</span> Share</button>
-                        <button class="btn btn-danger btn-small" onclick="deleteBill(${b.id},'${name.replace(/'/g,"\\'")}','${(mobile||'').replace(/'/g,"\\'")}')"><span class="btn-icon">🗑️</span> Delete</button>
                     </div>
                 </div>`; 
             }).join('') || '<p>No bills found.</p>';
+        }
+        
+        async function markBpDone(billId, custName, custMobile) {
+            if (!confirm('✅ Mark BP as DONE for this bill?\n\nOnce marked as done, Edit and Delete options will be disabled.')) return;
+            try {
+                await DB.update('bills', billId, { bp_status: 'done' });
+                alert('✅ BP marked as DONE!');
+                showCustomerHistory(custName, custMobile);
+                loadHistoryCustomers();
+                await refreshDropdownCache();
+            } catch (err) {
+                alert('❌ Error: ' + err.message);
+            }
         }
         
         function goBackToCustomers() { document.getElementById('history-main-view').style.display='block'; document.getElementById('history-detail-view').style.display='none'; }
@@ -645,11 +846,19 @@
                 const bills = await DB.query('bills');
                 const bill = bills.find(b => String(b.id) === String(billId));
                 if (!bill) { alert('❌ Bill not found'); return; }
+                if (bill.bp_status === 'done') {
+                    alert('⚠️ This bill is marked as BP DONE.\n\nEdit is disabled for completed bills.');
+                    return;
+                }
                 const allItems = await DB.query('bill_items');
                 editingItems = allItems.filter(i => String(i.bill_id) === String(billId)).map(i => ({...i}));
                 editingBillId = billId;
                 
+                const billNum = getBillNum(bill);
+                
                 let html = `<div style="background:#f8f9fa;padding:12px;border-radius:8px;margin-bottom:12px;">
+                        <label style="font-weight:600;font-size:0.85rem;">🎫 Bill Number</label>
+                        <input type="text" value="${billNum}" disabled style="background:#e8e8e8;font-weight:bold;">
                         <label style="font-weight:600;font-size:0.85rem;">👤 Customer Name</label>
                         <input type="text" id="edit-cust-name" value="${bill.cust_name || ''}">
                         <label style="font-weight:600;font-size:0.85rem;">📱 Mobile</label>
@@ -661,23 +870,28 @@
                             <option value="customer" ${bill.customer_type==='customer'?'selected':''}>🔵 Customer</option>
                         </select>
                     </div>
-                    <h4 style="margin-bottom:10px;">🛒 Items (${editingItems.length} found)</h4>
-                    <div id="edit-items-list">`;
-                editingItems.forEach((item, idx) => {
-                    html += `<div class="edit-item-row">
-                            <div>
-                                <div class="item-name">${item.item_name || 'Unknown'}</div>
-                                <div style="font-size:0.75rem;color:#666;">MRP: ${item.mrp || 0} | SP: ${item.sp || 0} | BP: ${item.bp || 0}</div>
-                            </div>
-                            <input type="number" value="${item.qty || 1}" min="1" onchange="editingItems[${idx}].qty=parseInt(this.value)||1" style="width:80px;">
-                        </div>`;
-                });
-                html += `</div><div style="display:flex;gap:8px;margin-top:15px;">
+                    
+                    <div class="add-product-section">
+                        <h4>➕ Add New Product to Bill</h4>
+                        <div class="search-dropdown" id="edit-prod-dropdown">
+                            <input type="text" id="edit-prod-search" placeholder="🔍 Search product to add..." autocomplete="off">
+                            <div class="dropdown-list" id="edit-prod-list"></div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-bottom:10px;">🛒 Bill Items (${editingItems.length})</h4>
+                    <div id="edit-items-list"></div>
+                    
+                    <div style="display:flex;gap:8px;margin-top:15px;">
                         <button class="btn btn-primary" onclick="saveEditedBill()" style="flex:1;"><span class="btn-icon">💾</span> Save Changes</button>
                         <button class="btn btn-back" onclick="closeEditModal()" style="flex:1;"><span class="btn-icon">❌</span> Cancel</button>
                     </div>`;
                 document.getElementById('edit-bill-content').innerHTML = html;
                 document.getElementById('edit-modal').style.display = 'block';
+                
+                renderEditItemsList();
+                setupEditProductSearch();
+                
             } catch (err) {
                 console.error('Error opening edit modal:', err);
                 alert('❌ Error: ' + err.message);
@@ -694,7 +908,11 @@
             if (!newName) { alert('⚠️ Customer name required'); return; }
             try {
                 let totalMRP = 0, totalSP = 0, totalBP = 0;
-                editingItems.forEach(item => { totalMRP += (item.mrp || 0) * (item.qty || 0); totalSP += (item.sp || 0) * (item.qty || 0); totalBP += (item.bp || 0) * (item.qty || 0); });
+                editingItems.forEach(item => { 
+                    totalMRP += (item.mrp || 0) * (item.qty || 0); 
+                    totalSP += (item.sp || 0) * (item.qty || 0); 
+                    totalBP += (item.bp || 0) * (item.qty || 0); 
+                });
                 await DB.update('bills', editingBillId, { cust_name: newName, cust_mobile: newMobile, customer_type: newType, total_mrp: totalMRP, total_sp: totalSP, total_bp: totalBP });
                 const bills = await DB.query('bills');
                 const bill = bills.find(b => String(b.id) === String(editingBillId));
@@ -704,13 +922,169 @@
                 const oldItems = await DB.query('bill_items');
                 const billItems = oldItems.filter(i => String(i.bill_id) === String(editingBillId));
                 for (let item of billItems) await DB.delete('bill_items', item.id);
-                for (let item of editingItems) await DB.run('bill_items', { bill_id: editingBillId, item_name: item.item_name, mrp: item.mrp, sp: item.sp, bp: item.bp, qty: item.qty, tot_mrp: (item.mrp || 0) * (item.qty || 0), tot_sp: (item.sp || 0) * (item.qty || 0), tot_bp: (item.bp || 0) * (item.qty || 0) });
+                for (let item of editingItems) {
+                    await DB.run('bill_items', { 
+                        bill_id: editingBillId, 
+                        item_name: item.item_name, 
+                        mrp: item.mrp, 
+                        sp: item.sp, 
+                        bp: item.bp, 
+                        qty: item.qty, 
+                        tot_mrp: (item.mrp || 0) * (item.qty || 0), 
+                        tot_sp: (item.sp || 0) * (item.qty || 0), 
+                        tot_bp: (item.bp || 0) * (item.qty || 0) 
+                    });
+                }
                 alert('✅ Bill updated!');
                 closeEditModal();
                 showCustomerHistory(newName, newMobile);
                 loadHistoryCustomers();
                 await refreshDropdownCache();
             } catch (err) { alert('❌ Error: ' + err.message); }
+        }
+
+        // NEW: View Bill Details Modal Functions
+        async function viewBillDetails(billId) {
+            try {
+                const bills = await DB.query('bills');
+                const bill = bills.find(b => String(b.id) === String(billId));
+                if (!bill) { alert('❌ Bill not found'); return; }
+                
+                const allItems = await DB.query('bill_items');
+                const items = allItems.filter(i => String(i.bill_id) === String(billId));
+                
+                const billNum = getBillNum(bill);
+                const custType = bill.customer_type || 'customer';
+                const pc = bill.price_columns ? bill.price_columns.split(',') : ['mrp','sp','bp'];
+                const bpStatus = bill.bp_status || 'pending';
+                const isCompleted = bpStatus === 'done';
+                
+                let html = `
+                    <div class="view-bill-header">
+                        <div class="company-name">🕉️ SK AAYURVEDA</div>
+                        <div class="company-sub">KEVA SUPER STOCK POINT</div>
+                        <div class="bill-no">🎫 Bill No: ${billNum}</div>
+                    </div>
+                    
+                    <div class="view-bill-info">
+                        <div class="view-bill-info-row">
+                            <span class="label">📅 Date:</span>
+                            <span class="value">${new Date(bill.date).toLocaleString()}</span>
+                        </div>
+                        <div class="view-bill-info-row">
+                            <span class="label">👤 Customer:</span>
+                            <span class="value">${bill.cust_name || 'N/A'}</span>
+                        </div>
+                        <div class="view-bill-info-row">
+                            <span class="label">📱 Mobile:</span>
+                            <span class="value">${bill.cust_mobile || 'N/A'}</span>
+                        </div>
+                        <div class="view-bill-info-row">
+                            <span class="label">🏷️ Type:</span>
+                            <span class="value"><span class="customer-type-badge type-${custType}" style="font-size:0.7rem;padding:2px 10px;margin:0;">${custType.toUpperCase()}</span></span>
+                        </div>
+                        <div class="view-bill-info-row">
+                            <span class="label">💰 BP Status:</span>
+                            <span class="value"><span class="bp-status-badge ${isCompleted ? 'bp-done' : 'bp-pending'}">${isCompleted ? '✅ DONE' : '⏳ PENDING'}</span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="view-bill-items">
+                        <h4 style="margin-bottom:8px;color:#1a1a2e;">🛒 Items (${items.length})</h4>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Item</th>
+                                        <th>Qty</th>
+                                        ${pc.includes('mrp') ? '<th>MRP</th><th>Total</th>' : ''}
+                                        ${pc.includes('sp') ? '<th>SP</th><th>Total</th>' : ''}
+                                        ${pc.includes('bp') ? '<th>BP</th><th>Total</th>' : ''}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+                
+                items.forEach((item, idx) => {
+                    const displayName = custType === 'stockist' ? (item.item_name || 'Unknown') : cleanProductName(item.item_name || 'Unknown', custType);
+                    html += `<tr>
+                        <td>${idx + 1}</td>
+                        <td>${displayName}</td>
+                        <td>${item.qty || 0}</td>`;
+                    if (pc.includes('mrp')) {
+                        html += `<td>${(item.mrp || 0).toFixed(2)}</td>
+                                 <td>${((item.mrp || 0) * (item.qty || 0)).toFixed(2)}</td>`;
+                    }
+                    if (pc.includes('sp')) {
+                        html += `<td>${(item.sp || 0).toFixed(2)}</td>
+                                 <td>${((item.sp || 0) * (item.qty || 0)).toFixed(2)}</td>`;
+                    }
+                    if (pc.includes('bp')) {
+                        html += `<td>${(item.bp || 0).toFixed(2)}</td>
+                                 <td>${((item.bp || 0) * (item.qty || 0)).toFixed(2)}</td>`;
+                    }
+                    html += `</tr>`;
+                });
+                
+                html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="view-bill-total">
+                `;
+                
+                if (pc.includes('mrp')) {
+                    html += `<div class="view-bill-total-row">
+                        <span>💲 Total MRP:</span>
+                        <span>Rs. ${(bill.total_mrp || 0).toFixed(2)}</span>
+                    </div>`;
+                }
+                if (pc.includes('sp')) {
+                    html += `<div class="view-bill-total-row">
+                        <span>🏷️ Total SP:</span>
+                        <span>Rs. ${(bill.total_sp || 0).toFixed(2)}</span>
+                    </div>`;
+                }
+                if (pc.includes('bp')) {
+                    html += `<div class="view-bill-total-row main">
+                        <span>💰 Total BP:</span>
+                        <span>${(bill.total_bp || 0).toFixed(2)}</span>
+                    </div>`;
+                } else {
+                    html += `<div class="view-bill-total-row main">
+                        <span>💲 Total MRP:</span>
+                        <span>Rs. ${(bill.total_mrp || 0).toFixed(2)}</span>
+                    </div>`;
+                }
+                
+                html += `
+                    </div>
+                    
+                    <div class="view-bill-footer">
+                        <div class="thank-you">Thank you! 🙏</div>
+                        <div class="visit-again">✨ Please visit again! ✨</div>
+                    </div>
+                    
+                    <div style="display:flex;gap:8px;margin-top:15px;">
+                        <button class="btn btn-share" onclick="closeViewBillModal();openShareModal(${bill.id})" style="flex:1;"><span class="btn-icon">📤</span> Share This Bill</button>
+                        <button class="btn btn-back" onclick="closeViewBillModal()" style="flex:1;"><span class="btn-icon">❌</span> Close</button>
+                    </div>
+                `;
+                
+                document.getElementById('view-bill-content').innerHTML = html;
+                document.getElementById('view-bill-modal').style.display = 'block';
+                
+            } catch (err) {
+                console.error('Error viewing bill:', err);
+                alert('❌ Error: ' + err.message);
+            }
+        }
+        
+        function closeViewBillModal() {
+            document.getElementById('view-bill-modal').style.display = 'none';
         }
 
         async function loadRequirementCustomers() {
@@ -738,7 +1112,8 @@
                 const is = await DB.query('bill_items');
                 csbi = is.filter(i => String(i.bill_id) === String(id));
                 csb = id;
-                document.getElementById('share-cust-info').innerHTML = `${csbill.cust_name} | ${csbill.cust_mobile||'No Mobile'}<br><span class="customer-type-badge type-${csbill.customer_type||'customer'}" style="font-size:0.65rem;padding:2px 8px;">${(csbill.customer_type||'customer').toUpperCase()}</span>`;
+                const billNum = getBillNum(csbill);
+                document.getElementById('share-cust-info').innerHTML = `<strong>#${billNum}</strong><br>${csbill.cust_name} | ${csbill.cust_mobile||'No Mobile'}<br><span class="customer-type-badge type-${csbill.customer_type||'customer'}" style="font-size:0.65rem;padding:2px 8px;">${(csbill.customer_type||'customer').toUpperCase()}</span>`;
                 document.getElementById('share-modal').style.display = 'block';
             } catch (err) {
                 console.error('Error opening share modal:', err);
@@ -757,13 +1132,17 @@
             const totalMrp = csbill.total_mrp || 0;
             const totalSp = csbill.total_sp || 0;
             const totalBp = csbill.total_bp || 0;
-            let t = '*SK AYURVEDAM WELLNESS CENTRE*\n';
+            const billNum = getBillNum(csbill);
+            
+            let t = '🕉️ *SK AAYURVEDA*\n';
             t += 'KEVA SUPER STOCK POINT\n';
+            t += '-------------------------\n';
+            t += 'Bill No: *' + billNum + '*\n';
+            t += 'Date: ' + new Date(csbill.date).toLocaleString() + '\n';
             t += '-------------------------\n';
             t += 'Customer: ' + (csbill.cust_name || 'N/A') + '\n';
             t += 'Type: ' + custType.toUpperCase() + '\n';
-            t += 'Mobile: ' + (csbill.cust_mobile || 'N/A') + '\n';
-            t += 'Date: ' + new Date(csbill.date).toLocaleString() + '\n\n';
+            t += 'Mobile: ' + (csbill.cust_mobile || 'N/A') + '\n\n';
             t += '*ITEMS:*\n';
             if (!csbi || csbi.length === 0) {
                 t += 'No items found\n';
@@ -799,7 +1178,8 @@
                 t += '-------------------------\n';
                 t += '*TOTAL MRP: Rs. ' + totalMrp.toFixed(2) + '*\n';
             }
-            t += 'Thank you!'; 
+            t += '\nThank you! 🙏\n';
+            t += '*Please visit again!* ✨'; 
             return t; 
         }
         
@@ -847,7 +1227,6 @@
             }
         }
         
-        // FIXED: PDF now works in Android app using Capacitor Filesystem
         async function shareViaPDF() {
             try { 
                 closeShareModal();
@@ -859,13 +1238,21 @@
                 const {jsPDF} = window.jspdf, doc = new jsPDF();
                 const custType = csbill.customer_type || 'customer';
                 const pc = csbill.price_columns ? csbill.price_columns.split(',') : ['mrp','sp','bp'];
+                const billNum = getBillNum(csbill);
                 
-                doc.setFontSize(18); doc.setFont(undefined,'bold'); doc.text('SK AYURVEDAM WELLNESS CENTRE',105,20,{align:'center'});
-                doc.setFontSize(12); doc.setFont(undefined,'normal'); doc.text('KEVA SUPER STOCK POINT',105,28,{align:'center'});
-                doc.setDrawColor(44,62,80); doc.line(14,33,196,33);
-                doc.setFontSize(11); doc.setFont(undefined,'bold'); doc.text('Bill To:',14,42); doc.setFont(undefined,'normal'); doc.text(csbill.cust_name || 'N/A',14,48); doc.text('Type: ' + custType.toUpperCase(),14,54);
-                if(csbill.cust_mobile) doc.text('Mobile: '+csbill.cust_mobile,14,60);
-                doc.setFont(undefined,'bold'); doc.text('Bill Date:',140,42); doc.setFont(undefined,'normal'); doc.text(new Date(csbill.date).toLocaleDateString(),140,48); doc.text('Bill No: #'+csbill.id,140,54);
+                doc.setFontSize(20); doc.setFont(undefined,'bold'); doc.text('SK AAYURVEDA',105,18,{align:'center'});
+                doc.setFontSize(11); doc.setFont(undefined,'normal'); doc.text('KEVA SUPER STOCK POINT',105,25,{align:'center'});
+                doc.setDrawColor(44,62,80); doc.line(14,29,196,29);
+                
+                doc.setFontSize(10); doc.setFont(undefined,'bold');
+                doc.text('Bill No: ' + billNum, 14, 37);
+                doc.text('Date: ' + new Date(csbill.date).toLocaleDateString(), 140, 37);
+                
+                doc.setFont(undefined,'bold'); doc.text('Bill To:',14,46); 
+                doc.setFont(undefined,'normal'); 
+                doc.text(csbill.cust_name || 'N/A',14,52); 
+                doc.text('Type: ' + custType.toUpperCase(),14,58);
+                if(csbill.cust_mobile) doc.text('Mobile: '+csbill.cust_mobile,14,64);
                 
                 let h, td, colStyles;
                 
@@ -899,7 +1286,7 @@
                     });
                 }
                 
-                doc.autoTable({startY:70, head:h, body:td, theme:'grid', headStyles:{fillColor:[44,62,80],textColor:255,fontSize:9}, bodyStyles:{fontSize:8}, columnStyles:colStyles, margin:{left:14,right:14}});
+                doc.autoTable({startY:72, head:h, body:td, theme:'grid', headStyles:{fillColor:[44,62,80],textColor:255,fontSize:9}, bodyStyles:{fontSize:8}, columnStyles:colStyles, margin:{left:14,right:14}});
                 
                 const fy = doc.lastAutoTable.finalY + 10;
                 doc.setFontSize(11); let y = fy;
@@ -917,62 +1304,41 @@
                     doc.setTextColor(0,0,0); y+=9;
                 }
                 
-                doc.setFontSize(10); doc.setFont(undefined,'italic'); doc.text('Thank you for your business!', 105, y+10, {align:'center'});
+                doc.setFontSize(10); doc.setFont(undefined,'italic'); 
+                doc.text('Thank you for your business!', 105, y+10, {align:'center'});
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(39, 174, 96);
+                doc.text('Please visit again!', 105, y+18, {align:'center'});
+                doc.setTextColor(0, 0, 0);
                 
-                const fileName = 'Bill_'+(csbill.cust_name || 'Unknown').replace(/[^a-z0-9]/gi,'_')+'_'+custType+'_'+new Date(csbill.date).toISOString().split('T')[0]+'.pdf';
+                const fileName = billNum + '_' + (csbill.cust_name || 'Unknown').replace(/[^a-z0-9]/gi,'_') + '_' + new Date(csbill.date).toISOString().split('T')[0] + '.pdf';
                 
-                // FIXED: Capacitor/Android PDF handling
                 if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
                     try {
                         const FS = window.Capacitor.Plugins.Filesystem;
-                        
-                        // Get PDF as base64
                         const pdfBase64 = doc.output('datauristring').split(',')[1];
-                        
-                        // Save to Cache directory (no permission needed)
-                        await FS.writeFile({
-                            path: fileName,
-                            data: pdfBase64,
-                            directory: 'CACHE',
-                            recursive: true
-                        });
-                        
-                        // Get file URI
-                        const uriResult = await FS.getUri({
-                            path: fileName,
-                            directory: 'CACHE'
-                        });
-                        
-                        // Try to share the PDF file
+                        await FS.writeFile({ path: fileName, data: pdfBase64, directory: 'CACHE', recursive: true });
+                        const uriResult = await FS.getUri({ path: fileName, directory: 'CACHE' });
                         if (window.Capacitor.Plugins.Share) {
                             try {
                                 await window.Capacitor.Plugins.Share.share({
-                                    title: 'Bill Invoice',
+                                    title: 'Bill Invoice - ' + billNum,
                                     text: 'Bill for ' + (csbill.cust_name || 'Customer'),
                                     url: uriResult.uri,
                                     dialogTitle: 'Share Bill PDF'
                                 });
                                 return;
-                            } catch (shareErr) {
-                                console.log('Share failed, trying browser:', shareErr);
-                            }
+                            } catch (shareErr) { console.log('Share failed:', shareErr); }
                         }
-                        
-                        // Fallback: Open PDF in browser
                         if (window.Capacitor.Plugins.Browser) {
                             await window.Capacitor.Plugins.Browser.open({ url: uriResult.uri });
                             return;
                         }
-                        
-                        alert('✅ PDF saved to app cache: ' + fileName);
+                        alert('✅ PDF saved: ' + fileName);
                         return;
-                        
-                    } catch (fsErr) {
-                        console.log('Filesystem save failed, trying download:', fsErr);
-                    }
+                    } catch (fsErr) { console.log('Filesystem failed:', fsErr); }
                 }
                 
-                // Browser fallback: Direct download
                 doc.save(fileName);
                 alert('✅ PDF downloaded: ' + fileName);
                 
@@ -982,9 +1348,11 @@
             }
         }
         
+        // UPDATED: Added view-bill-modal to click handler
         document.addEventListener('click', function(e) {
             if (e.target === document.getElementById('share-modal')) closeShareModal();
             if (e.target === document.getElementById('edit-modal')) closeEditModal();
+            if (e.target === document.getElementById('view-bill-modal')) closeViewBillModal();
         });
 
         async function loadDatalists() {
@@ -1016,18 +1384,39 @@
             if(s) sg.innerHTML+=`<div class="col-sp">🏷️ Total SP<span>Rs. <span id="tot-sp">${ts.toFixed(2)}</span></span></div>`;
             if(b) sg.innerHTML+=`<div class="col-bp">💰 Total BP<span><span id="tot-bp">${tb.toFixed(2)}</span> BP</span></div>`;
         }
+        
         async function saveBill() {
             const n=document.getElementById('cust-name').value.trim(), mo=document.getElementById('cust-mobile').value.trim(), uc=document.getElementById('bill-update-mobile').checked;
             const sm=document.getElementById('show-mrp').checked, ss=document.getElementById('show-sp').checked, sb=document.getElementById('show-bp').checked;
             if(!n||cart.length===0) return alert('Enter customer and items');
             const ct=getCustomerType(sm,ss,sb), pc=[]; if(sm)pc.push('mrp'); if(ss)pc.push('sp'); if(sb)pc.push('bp');
+            
+            const billNumber = await generateBillNumber();
+            
             const cs=await DB.query('customers'); let c=findCustomer(cs,n,mo);
             if(!c){const id=await DB.run('customers',{name:n,mobile:mo,customer_type:ct});c={id,name:n,mobile:mo,customer_type:ct};}
             else{if(uc&&mo&&c.mobile!==mo){await DB.update('customers',c.id,{mobile});c.mobile=mo;}await DB.update('customers',c.id,{customer_type:ct});c.customer_type=ct;}
             const tM=cart.reduce((s,i)=>s+i.mrp*i.qty,0), tS=cart.reduce((s,i)=>s+i.sp*i.qty,0), tB=cart.reduce((s,i)=>s+i.bp*i.qty,0);
-            const bid=await DB.run('bills',{customer_id:c.id,cust_name:n,cust_mobile:mo,customer_type:ct,date:new Date().toISOString(),total_mrp:tM,total_sp:tS,total_bp:tB,price_columns:pc.join(',')});
+            const bid=await DB.run('bills',{
+                bill_number: billNumber,
+                customer_id:c.id,
+                cust_name:n,
+                cust_mobile:mo,
+                customer_type:ct,
+                date:new Date().toISOString(),
+                total_mrp:tM,
+                total_sp:tS,
+                total_bp:tB,
+                price_columns:pc.join(','),
+                bp_status: 'pending'
+            });
             for(let i of cart) await DB.run('bill_items',{bill_id:bid,item_name:i.item_name,mrp:i.mrp,sp:i.sp,bp:i.bp,qty:i.qty,tot_mrp:i.mrp*i.qty,tot_sp:i.sp*i.qty,tot_bp:i.bp*i.qty});
-            alert(`✅ Bill Saved!\nType: ${ct.toUpperCase()}`); cart=[]; renderCart(); document.getElementById('cust-name').value=''; document.getElementById('cust-mobile').value=''; document.getElementById('customer-type-display').style.display='none'; resetUpdateMobile('bill'); 
+            alert(`✅ Bill Saved!\n\n🎫 Bill No: ${billNumber}\n👤 Type: ${ct.toUpperCase()}\n💰 BP: ${tB.toFixed(2)}`); 
+            cart=[]; renderCart(); 
+            document.getElementById('cust-name').value=''; 
+            document.getElementById('cust-mobile').value=''; 
+            document.getElementById('customer-type-display').style.display='none'; 
+            resetUpdateMobile('bill'); 
             await refreshDropdownCache();
         }
 
@@ -1057,7 +1446,8 @@
         function parseExcel(f) { return new Promise(r=>{const rd=new FileReader();rd.onload=function(e){const d=new Uint8Array(e.target.result),wb=XLSX.read(d,{type:'array'}),sh=wb.Sheets[wb.SheetNames[0]],j=XLSX.utils.sheet_to_json(sh,{header:1});r(j.slice(1).filter(r=>r.length>=4&&r[0]).map(r=>({item_name:String(r[0]).trim(),mrp:parseFloat(String(r[1]).replace(/,/g,''))||0,sp:parseFloat(String(r[2]).replace(/,/g,''))||0,bp:parseFloat(String(r[3]).replace(/,/g,''))||0})));};rd.readAsArrayBuffer(f);}); }
         async function clearProducts() { if(confirm('⚠️ Clear all PDF/Excel products?\n\n✅ Manual products (⭐) will NOT be deleted.')){await DB.clear('products');document.getElementById('upload-status').innerText='✅ PDF products cleared.';await refreshDropdownCache();} }
 
-        async function setupBackButton() { if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App){try{const App=window.Capacitor.Plugins.App;await App.addListener('backButton',()=>{if(document.getElementById('share-modal').style.display==='block'){closeShareModal();return;}if(document.getElementById('edit-modal').style.display==='block'){closeEditModal();return;}if(document.getElementById('history-detail-view').style.display==='block'){goBackToCustomers();return;}if(document.getElementById('req-detail-view').style.display==='block'){goBackToReqCustomers();return;}if(confirm('⚠️ Exit SK Ayurvedam app?'))App.exitApp();});}catch(e){console.error(e);} } }
+        // UPDATED: Added view-bill-modal to back button handler
+        async function setupBackButton() { if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App){try{const App=window.Capacitor.Plugins.App;await App.addListener('backButton',()=>{if(document.getElementById('share-modal').style.display==='block'){closeShareModal();return;}if(document.getElementById('edit-modal').style.display==='block'){closeEditModal();return;}if(document.getElementById('view-bill-modal').style.display==='block'){closeViewBillModal();return;}if(document.getElementById('history-detail-view').style.display==='block'){goBackToCustomers();return;}if(document.getElementById('req-detail-view').style.display==='block'){goBackToReqCustomers();return;}if(confirm('⚠️ Exit SK Aayurveda app?'))App.exitApp();});}catch(e){console.error(e);} } }
 
         async function exportData() {
             try { 
@@ -1067,7 +1457,7 @@
                 let bd = {}; 
                 if (DB.isCapacitor && DB.conn) {
                     bd = {
-                        version: '1.1',
+                        version: '1.4',
                         exportDate: new Date().toISOString(),
                         customers: await DB.query('customers'),
                         products: await DB.query('products'),
@@ -1077,7 +1467,7 @@
                         requirements: await DB.query('requirements')
                     };
                 } else {
-                    bd = { version: '1.1', exportDate: new Date().toISOString(), ...DB.data };
+                    bd = { version: '1.4', exportDate: new Date().toISOString(), ...DB.data };
                 }
                 const jsonStr = JSON.stringify(bd, null, 2);
                 const fileName = `SKA_Backup_${new Date().toISOString().split('T')[0]}.json`;
@@ -1099,7 +1489,7 @@
                         });
                         if (window.Capacitor.Plugins.Share) {
                             await window.Capacitor.Plugins.Share.share({
-                                title: 'SK Ayurvedam Backup',
+                                title: 'SK Aayurveda Backup',
                                 text: `Backup: ${bd.customers.length} customers`,
                                 url: uri.uri,
                                 dialogTitle: 'Save Backup'
@@ -1116,7 +1506,7 @@
                 if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Share) {
                     try {
                         await window.Capacitor.Plugins.Share.share({
-                            title: 'SK Ayurvedam Backup',
+                            title: 'SK Aayurveda Backup',
                             text: jsonStr,
                             dialogTitle: 'Share Backup'
                         });
@@ -1185,7 +1575,13 @@
                 if (bd.customers) for (let i of bd.customers) { delete i.id; await DB.run('customers', i); cn.c++; }
                 if (bd.products) for (let i of bd.products) { delete i.id; await DB.run('products', i); cn.p++; }
                 if (bd.manual_products) for (let i of bd.manual_products) { delete i.id; await DB.run('manual_products', i); cn.mp++; }
-                if (bd.bills) for (let i of bd.bills) { delete i.id; await DB.run('bills', i); cn.b++; }
+                if (bd.bills) for (let i of bd.bills) { 
+                    if (!i.bill_number) i.bill_number = 'SKAA' + String(cn.b + 1).padStart(4, '0');
+                    if (!i.bp_status) i.bp_status = 'pending';
+                    delete i.id; 
+                    await DB.run('bills', i); 
+                    cn.b++; 
+                }
                 if (bd.bill_items) for (let i of bd.bill_items) { delete i.id; await DB.run('bill_items', i); cn.bi++; }
                 if (bd.requirements) for (let i of bd.requirements) { delete i.id; await DB.run('requirements', i); cn.r++; }
                 se.innerText = `✅ Restored!`; 
